@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أرشيف الموظفين — البيانات الاجتماعية الشخصية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#07090e;--s1:#0d1018;--s2:#131720;--s3:#191f2a;
+  --br:#1d2436;--br2:#273050;
+  --gold:#c8973a;--gold2:#e8b55a;
+  --blue:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;
+  --tx:#edf0f7;--mu:#7a8599;--mu2:#44526a;
+  --r:10px;--rl:16px;
+  --shl:0 16px 56px rgba(0,0,0,.8);
+  --tr:.18s cubic-bezier(.4,0,.2,1);
+}
+body.light{
+  --bg:#f0f2f7;--s1:#ffffff;--s2:#f5f7fb;--s3:#eaecf4;
+  --br:#d1d8e8;--br2:#bcc6da;
+  --tx:#1a2035;--mu:#5a6a8a;--mu2:#8a9ab8;
+  --shl:0 12px 40px rgba(0,0,0,.14);
+}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--s1)}
+::-webkit-scrollbar-thumb{background:var(--br2);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* TOAST */
+#toast{position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--s2);border:1px solid var(--br2);color:var(--tx);padding:12px 28px;border-radius:50px;font-size:14px;font-weight:700;z-index:99999;box-shadow:var(--shl);transition:transform .38s cubic-bezier(.34,1.56,.64,1),opacity .38s;opacity:0;pointer-events:none;max-width:90vw}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.err{border-color:var(--red);color:#f87171}
+
+/* LOGIN */
+#loginPage{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+#loginPage::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 25% 85%,rgba(200,151,58,.07),transparent 55%),radial-gradient(ellipse 65% 85% at 78% 12%,rgba(59,130,246,.05),transparent 55%)}
+.lgrid{position:absolute;inset:0;background-image:linear-gradient(var(--br) 1px,transparent 1px),linear-gradient(90deg,var(--br) 1px,transparent 1px);background-size:52px 52px;opacity:.3;mask-image:radial-gradient(ellipse 60% 60% at 50% 50%,black 20%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 60% 60% at 50% 50%,black 20%,transparent 100%)}
+.lcard{position:relative;z-index:2;width:430px;max-width:calc(100vw - 32px);background:var(--s1);border:1px solid var(--br2);border-radius:24px;padding:44px 40px;box-shadow:var(--shl);animation:fadeUp .5s ease}
+.llogo{text-align:center;margin-bottom:28px}
+.llogo .licon{font-size:48px}
+.llogo h1{font-size:20px;font-weight:900;margin-top:12px;background:linear-gradient(135deg,var(--gold2),var(--tx));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.llogo p{font-size:12px;color:var(--mu);margin-top:5px}
+.lf{margin-bottom:14px}
+.lf label{display:block;font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px}
+.lf input{width:100%;padding:13px 16px;background:var(--s2);border:1.5px solid var(--br);border-radius:var(--r);color:var(--tx);font-family:inherit;font-size:14px;transition:var(--tr);text-align:right}
+.lf input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,151,58,.12)}
+.lbtn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),#9a6e20);border:none;border-radius:var(--r);color:#07090e;font-family:inherit;font-size:15px;font-weight:900;cursor:pointer;margin-top:8px;box-shadow:0 4px 20px rgba(200,151,58,.28);transition:var(--tr)}
+.lbtn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(200,151,58,.42)}
+.lbtn:disabled{opacity:.6;cursor:wait;transform:none}
+#loginErr{color:var(--red);font-size:13px;text-align:center;margin-top:10px;font-weight:700;min-height:18px}
+.cfgwarn{display:none;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);color:#fbbf24;border-radius:var(--r);padding:10px 12px;font-size:12px;font-weight:700;line-height:1.8;margin-bottom:14px}
+
+/* APP */
+#app{display:none}
+.hdr{height:62px;background:var(--s1);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+.hbrand{display:flex;align-items:center;gap:12px}
+.hicon{font-size:26px}
+.htitle{font-size:14px;font-weight:900;border-right:1px solid var(--br);padding-right:12px}
+.hsub{font-size:11px;color:var(--gold);font-weight:700}
+.hright{display:flex;align-items:center;gap:7px}
+.chip{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--br);border-radius:50px;padding:6px 15px;white-space:nowrap;flex-shrink:0}
+.chip .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.chip .sn{font-size:18px;font-weight:900}
+.chip .sl{font-size:11px;color:var(--mu);font-weight:600}
+.icobtn{width:36px;height:36px;background:var(--s2);border:1px solid var(--br);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:var(--tr);color:var(--mu)}
+.icobtn:hover{border-color:var(--br2);background:var(--s3);color:var(--tx)}
+.logoutbtn{padding:7px 13px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:var(--red);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:var(--tr)}
+.logoutbtn:hover{background:rgba(239,68,68,.2);border-color:var(--red)}
+
+/* SECTION TABS (يتوسع لاحقاً بأقسام جديدة) */
+.tabs{background:var(--s1);border-bottom:1px solid var(--br);padding:0 18px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 16px;font-family:inherit;font-size:13px;font-weight:700;color:var(--mu);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:var(--tr)}
+.tab:hover{color:var(--tx)}
+.tab.on{color:var(--gold2);border-bottom-color:var(--gold)}
+
+.sbar{background:var(--s1);border-bottom:1px solid var(--br);padding:9px 18px;display:flex;gap:7px;overflow-x:auto;scrollbar-width:none}
+.sbar::-webkit-scrollbar{display:none}
+
+.abody{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 150px)}
+.sidebar{background:var(--s1);border-left:1px solid var(--br);padding:15px;overflow-y:auto;position:sticky;top:62px;max-height:calc(100vh - 62px)}
+.fhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;padding-bottom:11px;border-bottom:1px solid var(--br)}
+.fhead h2{font-size:14px;font-weight:900}
+.fbadge{font-size:10px;color:var(--mu);background:var(--s2);padding:3px 9px;border-radius:50px;border:1px solid var(--br)}
+.fbadge.edit{color:var(--blue);border-color:rgba(59,130,246,.4)}
+.fg{margin-bottom:11px}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--mu);margin-bottom:4px}
+.fg label .req{color:var(--red);margin-right:2px}
+.fi{width:100%;padding:9px 11px;background:var(--s2);border:1.5px solid var(--br);border-radius:var(--r);color:var(--tx);font-family:inherit;font-size:13px;transition:var(--tr);text-align:right;display:block}
+.fi:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,151,58,.1)}
+.fi.bad{border-color:var(--red)}
+.fi[readonly]{background:var(--s3);color:var(--gold);font-weight:700;cursor:default}
+select.fi option{background:var(--s2);color:var(--tx)}
+textarea.fi{resize:vertical;min-height:78px}
+.hint{font-size:10px;color:var(--mu2);margin-top:3px}
+.sbtn{width:100%;padding:12px;border:none;border-radius:var(--r);font-family:inherit;font-size:14px;font-weight:900;cursor:pointer;transition:var(--tr);margin-top:7px;color:#fff}
+.sbtn.add{background:linear-gradient(135deg,var(--green),#166534);box-shadow:0 4px 16px rgba(34,197,94,.2)}
+.sbtn.save{background:linear-gradient(135deg,var(--blue),#1d4ed8);box-shadow:0 4px 16px rgba(59,130,246,.2)}
+.sbtn:hover{transform:translateY(-2px)}
+.sbtn:disabled{opacity:.6;cursor:wait;transform:none}
+.cbtn{width:100%;padding:8px;background:transparent;border:1px solid var(--br2);border-radius:var(--r);color:var(--mu);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:var(--tr);margin-top:6px;display:none}
+.cbtn:hover{border-color:var(--red);color:var(--red)}
+
+/* MAIN */
+.main{padding:16px;overflow-x:auto}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:9px}
+.tl h3{font-size:16px;font-weight:900}
+.tl p{font-size:12px;color:var(--mu);margin-top:1px}
+.tr{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.sbox{position:relative}
+.sbox input{padding:9px 38px 9px 14px;background:var(--s2);border:1.5px solid var(--br);border-radius:50px;color:var(--tx);font-family:inherit;font-size:13px;transition:var(--tr);text-align:right;width:290px;max-width:100%}
+.sbox input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,151,58,.1)}
+.sbox .si{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+.fsel{padding:9px 12px;background:var(--s2);border:1.5px solid var(--br);border-radius:50px;color:var(--tx);font-family:inherit;font-size:13px;cursor:pointer}
+.fsel:focus{outline:none;border-color:var(--gold)}
+.fsel option{background:var(--s2);color:var(--tx)}
+.abtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border:1px solid var(--br);border-radius:50px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:var(--tr);background:var(--s2);color:var(--tx)}
+.abtn:hover{border-color:var(--br2);background:var(--s3)}
+.abtn.g{border-color:rgba(34,197,94,.3);color:#4ade80}
+.abtn.g:hover{background:rgba(34,197,94,.08);border-color:var(--green)}
+
+.twrap{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--s2);color:var(--mu);font-size:11px;font-weight:700;text-align:right;padding:11px 14px;border-bottom:1px solid var(--br);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--br);vertical-align:middle}
+tbody tr{cursor:pointer;transition:background var(--tr)}
+tbody tr:hover{background:var(--s2)}
+tbody tr:last-child td{border-bottom:none}
+.empno{font-family:monospace;font-weight:900;color:var(--gold2);font-size:13px}
+.ename{font-weight:700}
+.gov{display:inline-block;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#60a5fa;border-radius:50px;padding:2px 11px;font-size:11px;font-weight:700;white-space:nowrap}
+.addr{color:var(--mu);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rowact{display:flex;gap:5px;justify-content:flex-start}
+.rbtn{width:30px;height:30px;border-radius:7px;border:1px solid var(--br);background:var(--s2);cursor:pointer;font-size:13px;transition:var(--tr)}
+.rbtn:hover{border-color:var(--gold)}
+.rbtn.del:hover{border-color:var(--red);background:rgba(239,68,68,.1)}
+.empty{text-align:center;padding:56px 20px;color:var(--mu)}
+.empty .eic{font-size:38px;margin-bottom:10px}
+.empty b{display:block;color:var(--tx);font-size:14px;margin-bottom:4px}
+.spinner{width:26px;height:26px;border:3px solid var(--br2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+
+/* MODALS */
+.ov{position:fixed;inset:0;background:rgba(5,7,12,.82);backdrop-filter:blur(4px);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
+.ov.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--br2);border-radius:20px;width:480px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:var(--shl);animation:fadeUp .25s ease}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--br)}
+.mhdr h3{font-size:15px;font-weight:900}
+.mcls{width:30px;height:30px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--mu);cursor:pointer;font-size:14px}
+.mcls:hover{color:var(--tx);border-color:var(--br2)}
+.mbody{padding:18px 20px}
+.drow{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--br);font-size:13px}
+.drow:last-child{border-bottom:none}
+.drow .k{color:var(--mu);font-weight:700;flex-shrink:0}
+.drow .v{font-weight:700;text-align:left;word-break:break-word}
+.mfoot{display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--br)}
+.mfoot button{flex:1;padding:10px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:var(--tr)}
+.mfoot button:hover{border-color:var(--br2);background:var(--s3)}
+.mfoot .danger{border-color:rgba(239,68,68,.35);color:#f87171}
+.mfoot .danger:hover{background:rgba(239,68,68,.12);border-color:var(--red)}
+.mfoot .primary{background:linear-gradient(135deg,var(--blue),#1d4ed8);border-color:transparent;color:#fff}
+.sec{font-size:11px;font-weight:700;color:var(--gold);margin:18px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--br)}
+.firow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fi[type=date]{color-scheme:dark}
+body.light .fi[type=date]{color-scheme:light}
+.drop{border:1.5px dashed var(--br2);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;background:var(--s2);transition:var(--tr);font-size:12px;color:var(--mu);font-weight:600}
+.drop:hover,.drop.over{border-color:var(--gold);background:rgba(200,151,58,.05);color:var(--tx)}
+.drop .dic{font-size:22px;margin-bottom:3px}
+.flist{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.fitem{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:7px 10px;font-size:12px}
+.fitem.new{border-color:rgba(200,151,58,.45)}
+.fitem .fn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.fitem .fs{color:var(--mu2);font-size:10px;flex-shrink:0}
+.fitem a{color:var(--blue);text-decoration:none;font-weight:700;flex-shrink:0}
+.fitem .fx{background:none;border:none;color:var(--mu);cursor:pointer;font-size:13px}
+.fitem .fx:hover{color:var(--red)}
+.docs{display:flex;flex-direction:column;gap:6px}
+.doc{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:var(--s2);border:1.5px solid var(--br);border-radius:var(--r);padding:8px 11px;cursor:pointer;font-family:inherit;color:var(--tx);font-size:12px;font-weight:700;transition:var(--tr);text-align:right}
+.doc:hover{border-color:var(--br2)}
+.doc .bx{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;border:1.5px solid}
+.doc.yes .bx{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
+.doc.no .bx{background:rgba(239,68,68,.12);border-color:var(--red);color:var(--red)}
+.pbadge{display:inline-block;border-radius:50px;padding:2px 11px;font-size:11px;font-weight:900;white-space:nowrap;border:1px solid}
+.pbadge.full{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#4ade80}
+.pbadge.part{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24}
+.pbadge.none{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#f87171}
+.dsub{font-size:11px;font-weight:700;color:var(--gold);margin:14px 0 6px}
+.dpap{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;font-weight:600}
+.dpap a{color:var(--blue);text-decoration:none}
+.money{font-family:monospace;font-weight:900;color:#4ade80;white-space:nowrap}
+.twrap.scroll{overflow-x:auto}
+.twrap.scroll table{min-width:1150px}
+@media (max-width:860px){
+  .abody{grid-template-columns:1fr}
+  .sidebar{position:static;max-height:none;border-left:none;border-bottom:1px solid var(--br)}
+  .sbox input{width:100%}
+  .sbox{flex:1 1 100%}
+  .hbrand .htitle{display:none}
+  #userChip{display:none}
+  .addr{max-width:140px}
+}
+
+/* ═══════ طبقة "نظام الشركة" — لازم تكون آخر حاجة في الـ CSS ═══════ */
+:root{--r:6px;--rl:8px;--hh:56px;--th:40px;--sh:48px;--fh:26px}
+html,body{height:100%;overflow:hidden}
+body{font-size:13px;-webkit-user-select:none;user-select:none}
+input,textarea,select,td,.drow .v{-webkit-user-select:text;user-select:text}
+
+.hdr{height:var(--hh);position:static;box-shadow:none;padding:0 16px}
+.hicon{font-size:20px}
+.icobtn{width:32px;height:32px;border-radius:var(--r)}
+.logoutbtn{border-radius:var(--r)}
+
+.tabs{height:var(--th);padding:0 12px;gap:0;background:var(--s2)}
+.tab{height:100%;padding:0 18px;font-size:12.5px}
+.tab.on{background:var(--s1)}
+
+.sbar{height:var(--sh);align-items:center;padding:0 16px;gap:8px}
+.chip{border-radius:var(--r);padding:4px 12px;gap:7px}
+.chip .sn{font-size:15px}
+
+.abody{height:calc(100vh - var(--hh) - var(--th) - var(--sh) - var(--fh));min-height:0;grid-template-columns:420px 1fr;grid-template-rows:minmax(0,1fr)}
+.sidebar{position:static;max-height:none;height:100%;overflow-y:auto;padding:14px}
+.main{padding:14px;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.toolbar{flex-shrink:0}
+.twrap,.twrap.scroll{flex:1;min-height:0;overflow:auto;border-radius:var(--r)}
+table{border-collapse:separate;border-spacing:0}
+thead th{position:sticky;top:0;z-index:3;background:var(--s3);padding:9px 10px;border-bottom:1px solid var(--br2)}
+td{padding:7px 10px;font-size:12.5px}
+.twrap.scroll table{min-width:0}
+tbody tr:nth-child(even){background:rgba(127,127,127,.04)}
+tbody tr:hover{background:rgba(200,151,58,.09)}
+
+.sbox input,.fsel,.abtn,.fi,.cbtn{border-radius:var(--r)}
+.sbox input{padding:8px 36px 8px 12px}
+.fsel{padding:8px 10px}
+.gov,.pbadge,.fbadge{border-radius:4px}
+.rbtn{width:26px;height:26px;font-size:12px;border-radius:5px}
+.fi{padding:8px 10px}
+.fg{margin-bottom:10px}
+.sbtn{border-radius:var(--r);box-shadow:none!important;padding:10px;font-size:13px}
+.sbtn.add{background:#1f7a46}
+.sbtn.save{background:#2563eb}
+.sbtn:hover{transform:none;filter:brightness(1.12)}
+.modal,.lcard{border-radius:10px}
+.lbtn{border-radius:var(--r);box-shadow:none}
+.ov{backdrop-filter:none;background:rgba(5,7,12,.7)}
+
+#toast{top:auto;bottom:calc(var(--fh) + 14px);border-radius:var(--r);transform:translateX(-50%) translateY(90px)}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+.statusbar{position:fixed;left:0;right:0;bottom:0;height:var(--fh);z-index:150;display:flex;align-items:center;gap:18px;padding:0 14px;background:var(--s2);border-top:1px solid var(--br);font-size:11px;color:var(--mu)}
+.statusbar .sdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:6px}
+.statusbar.on .sdot{background:var(--green)}
+
+@media (max-width:860px){
+  html,body{height:auto;overflow:auto}
+  body{padding-bottom:var(--fh)}
+  .abody{height:auto;grid-template-columns:1fr;grid-template-rows:none}
+  .sidebar{height:auto;overflow:visible}
+  .main{display:block;overflow:visible}
+  .twrap,.twrap.scroll{max-height:70vh}
+  .sbar{height:auto;min-height:var(--sh);padding:6px 12px}
+  .statusbar{gap:10px;font-size:10px}
+  .statusbar > span:last-child{display:none}
+}
+
+/* ═══ إضافات: الصورة الشخصية / حالة الموظف / أعمدة ثابتة في جدول الوظيفي ═══ */
+.photobox{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:10px}
+.photobox .ph{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--s3);border:1px solid var(--br2);flex-shrink:0;align-items:center;justify-content:center;color:var(--mu2);font-size:10px;text-align:center}
+.phbtns{display:flex;flex-direction:column;gap:6px;flex:1}
+.av{width:26px;height:26px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-left:8px;border:1px solid var(--br2);background:var(--s3)}
+.avl{display:block;width:96px;height:96px;border-radius:50%;object-fit:cover;margin:0 auto 14px;border:2px solid var(--br2);background:var(--s3)}
+.st{display:inline-block;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid}
+.st.on{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#4ade80}
+.st.probation{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24}
+.st.leave{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:#60a5fa}
+.st.susp{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#f87171}
+.st.ended{background:rgba(127,127,127,.12);border-color:rgba(127,127,127,.3);color:var(--mu)}
+.twrap.scroll table{min-width:1550px}
+.twrap.scroll th:nth-child(1),.twrap.scroll td:nth-child(1){position:sticky;inset-inline-start:0;z-index:2;width:88px;min-width:88px;background-color:var(--s1)}
+.twrap.scroll th:nth-child(2),.twrap.scroll td:nth-child(2){position:sticky;inset-inline-start:88px;z-index:2;min-width:160px;background-color:var(--s1)}
+.twrap.scroll thead th:nth-child(1),.twrap.scroll thead th:nth-child(2){z-index:4;background-color:var(--s3)}
+.twrap.scroll tbody tr:nth-child(even) td:nth-child(-n+2){background-image:linear-gradient(rgba(127,127,127,.04),rgba(127,127,127,.04))}
+.twrap.scroll tbody tr:hover td:nth-child(-n+2){background-image:linear-gradient(rgba(200,151,58,.09),rgba(200,151,58,.09))}
+#jq{width:380px}
+@media (max-width:860px){#jq{width:100%}}
+
+/* تكبير الفورم ومنع السكرول الأفقي */
+.sidebar{overflow-x:hidden;padding:18px}
+.sidebar .fg,.sidebar .firow>*{min-width:0}
+.sidebar .fi{max-width:100%;min-width:0;font-size:13.5px;padding:10px 12px}
+.sidebar .fg label{font-size:12px}
+.sidebar .sec{font-size:12px}
+.sidebar .hint{font-size:11px}
+.sidebar .sbtn{padding:12px;font-size:14px}
+/* ═══ تحسين شكل الفورم ═══ */
+.sidebar .sec{display:flex;align-items:center;margin:22px 0 12px;padding-bottom:7px;font-size:12.5px}
+.sidebar .sec::before{content:'';width:3px;height:13px;background:var(--gold);border-radius:2px;margin-inline-end:8px}
+.sidebar .firow{gap:10px}
+.sidebar textarea.fi{min-height:84px;resize:vertical}
+.docs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.doc{padding:7px 9px;font-size:12px;line-height:1.5}
+#saveBtn,#jSaveBtn{position:sticky;bottom:-18px;z-index:6;margin-top:14px;box-shadow:0 0 0 10px var(--s1)!important}
+/* ═══ جدول البيانات الوظيفية: بدون سكرول أفقي ═══ */
+.twrap.scroll{overflow-x:hidden}
+.twrap.scroll table{min-width:0!important;width:100%;table-layout:fixed}
+.twrap.scroll th,.twrap.scroll td{white-space:normal;overflow-wrap:anywhere;line-height:1.5;padding:8px 8px}
+.twrap.scroll td.money,.twrap.scroll td .st{white-space:nowrap}
+.twrap.scroll th:nth-child(1),.twrap.scroll td:nth-child(1),
+.twrap.scroll th:nth-child(2),.twrap.scroll td:nth-child(2){position:static;min-width:0;inset-inline-start:auto}
+.twrap.scroll th:nth-child(1){width:84px}
+.twrap.scroll th:nth-child(2){width:15%}
+.twrap.scroll th:nth-child(10){width:86px}
+.twrap.scroll th:nth-child(11),.twrap.scroll th:nth-child(12){width:92px}
+.twrap.scroll th:nth-child(13){width:108px}
+.twrap.scroll th:nth-child(14){width:76px}
+@media (max-width:1650px){.twrap.scroll th:nth-child(12),.twrap.scroll td:nth-child(12),.twrap.scroll th:nth-child(8),.twrap.scroll td:nth-child(8){display:none}}
+@media (max-width:1450px){.twrap.scroll th:nth-child(7),.twrap.scroll td:nth-child(7),.twrap.scroll th:nth-child(6),.twrap.scroll td:nth-child(6){display:none}}
+@media (max-width:1250px){.twrap.scroll th:nth-child(9),.twrap.scroll td:nth-child(9),.twrap.scroll th:nth-child(4),.twrap.scroll td:nth-child(4),.twrap.scroll th:nth-child(11),.twrap.scroll td:nth-child(11){display:none}}
+@media (max-width:1000px){.twrap.scroll th:nth-child(10),.twrap.scroll td:nth-child(10),.twrap.scroll th:nth-child(5),.twrap.scroll td:nth-child(5){display:none}}
+/* ═══ قسم التعاقد والأجور ═══ */
+.sumbox{background:var(--s3);border:1.5px solid var(--br);border-radius:var(--r);padding:9px 12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:var(--mu);margin-bottom:8px}
+.sumbox b{font-family:monospace;font-size:15px;color:#4ade80}
+.sumbox.big{border-color:var(--gold)}
+.sumbox.big b{font-size:17px;color:var(--gold2)}
+.fi:disabled{opacity:.45;cursor:not-allowed}
+.ctw{overflow-x:hidden}
+.ctw table{min-width:0;width:100%;table-layout:fixed}
+.ctw th,.ctw td{white-space:normal;overflow-wrap:anywhere;line-height:1.5;padding:8px 8px}
+.ctw td.money,.ctw td .st{white-space:nowrap}
+.ctw th:nth-child(1){width:84px}
+.ctw th:nth-child(2){width:17%}
+.ctw th:nth-child(4),.ctw th:nth-child(5){width:96px}
+.ctw th:nth-child(6),.ctw th:nth-child(7),.ctw th:nth-child(8){width:100px}
+.ctw th:nth-child(10){width:76px}
+@media (max-width:1250px){.ctw th:nth-child(9),.ctw td:nth-child(9){display:none}}
+@media (max-width:1100px){.ctw th:nth-child(6),.ctw td:nth-child(6),.ctw th:nth-child(7),.ctw td:nth-child(7){display:none}}
+@media (max-width:900px){.ctw th:nth-child(4),.ctw td:nth-child(4){display:none}}
+@media (max-width:600px){.ctw th:nth-child(3),.ctw td:nth-child(3),.ctw th:nth-child(5),.ctw td:nth-child(5){display:none}.ctw th:nth-child(1){width:64px}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="lgrid"></div>
+  <div class="lcard">
+    <div class="llogo">
+      <div class="licon">🗄️</div>
+      <h1>أرشيف الموظفين</h1>
+      <p>سجّل دخولك للوصول إلى الأرشيف</p>
+    </div>
+    <div class="cfgwarn" id="cfgWarn">إعدادات Firebase لسه مش متحطة. افتح الملف وعدّل <code>firebaseConfig</code> ببيانات مشروع الأرشيف الجديد.</div>
+    <div class="lf"><label for="emIn">البريد الإلكتروني</label><input type="email" id="emIn" autocomplete="username" dir="ltr" style="text-align:right"></div>
+    <div class="lf"><label for="pwIn">كلمة المرور</label><input type="password" id="pwIn" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="lbtn" id="loginBtn" onclick="doLogin()">دخول</button>
+    <div id="loginErr" role="alert"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="statusbar" id="statusbar">
+    <span><i class="sdot"></i><span id="sbConn">جاري الاتصال…</span></span>
+    <span id="sbTime"></span>
+    <span style="margin-inline-start:auto">أرشيف الموظفين · الإصدار 1.0</span>
+  </div>
+  <header class="hdr">
+    <div class="hbrand">
+      <div class="hicon">🗄️</div>
+      <div>
+        <div class="htitle">أرشيف الموظفين</div>
+        <div class="hsub">TEAM ARCHIVE</div>
+      </div>
+    </div>
+    <div class="hright">
+      <div class="chip" id="userChip" title="المستخدم الحالي">
+        <div class="dot" style="background:var(--gold)"></div>
+        <span id="userLabel" style="font-size:12px;font-weight:700" dir="ltr">—</span>
+      </div>
+      <button class="icobtn" id="themeBtn" title="تغيير الثيم" onclick="toggleTheme()">🌙</button>
+      <button class="logoutbtn" onclick="doLogout()">خروج</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-sec="personal">👤 البيانات الاجتماعية الشخصية</button>
+    <button class="tab" data-sec="job">💼 البيانات الوظيفية</button>
+    <button class="tab" data-sec="contract">💳 بيانات التعاقد والأجور</button>
+  </nav>
+
+  <!-- ═══ القسم 2: البيانات الوظيفية ═══ -->
+  <div class="sbar" data-sec="job" style="display:none">
+    <div class="chip"><div class="dot" style="background:var(--gold)"></div><span class="sn" id="jsTotal">0</span><span class="sl">سجلات وظيفية</span></div>
+    <div class="chip"><div class="dot" style="background:var(--blue)"></div><span class="sn" id="jsDept">0</span><span class="sl">إدارات رئيسية</span></div>
+    <div class="chip"><div class="dot" style="background:var(--orange)"></div><span class="sn" id="jsMissing">0</span><span class="sl">موظفين لسه ملهمش بيانات وظيفية</span></div>
+    <div class="chip"><div class="dot" style="background:var(--green)"></div><span class="sn" id="jsShown">0</span><span class="sl">نتائج العرض</span></div>
+  </div>
+
+  <div class="abody" data-sec="job" style="display:none">
+    <aside class="sidebar">
+      <div class="fhead">
+        <h2 id="jFormTitle">➕ بيانات وظيفية</h2>
+        <span class="fbadge" id="jFormBadge">إضافة</span>
+      </div>
+
+      <div class="fg">
+        <label for="j_no"><span class="req">*</span>الرقم الوظيفي</label>
+        <input class="fi" id="j_no" list="dl_emp" dir="ltr" style="text-align:right" autocomplete="off" maxlength="20">
+        <datalist id="dl_emp"></datalist>
+        <div class="hint" id="jNoHint">اكتب الرقم أو اختاره من القايمة. لازم يكون الموظف متسجل في البيانات الشخصية.</div>
+      </div>
+      <div class="fg">
+        <label for="j_name">الاسم</label>
+        <input class="fi" id="j_name" readonly placeholder="بيظهر تلقائياً من البيانات الشخصية">
+      </div>
+      <div class="fg">
+        <label for="j_ins">رقم التأمين</label>
+        <input class="fi" id="j_ins" dir="ltr" style="text-align:right" inputmode="numeric" maxlength="20" autocomplete="off">
+      </div>
+      <div class="fg">
+        <label for="j_title"><span class="req">*</span>المسمى الوظيفي</label>
+        <input class="fi" id="j_title" list="dl_title" maxlength="80" autocomplete="off">
+        <datalist id="dl_title"></datalist>
+      </div>
+      <div class="fg">
+        <label for="j_wtype">نوع العمل</label>
+        <input class="fi" id="j_wtype" list="dl_wtype" maxlength="60" autocomplete="off">
+        <datalist id="dl_wtype"></datalist>
+      </div>
+      <div class="fg">
+        <label for="j_dept">الإدارة الرئيسية</label>
+        <input class="fi" id="j_dept" list="dl_dept" maxlength="80" autocomplete="off">
+        <datalist id="dl_dept"></datalist>
+      </div>
+      <div class="fg">
+        <label for="j_sub">الإدارة الفرعية</label>
+        <input class="fi" id="j_sub" list="dl_sub" maxlength="80" autocomplete="off">
+        <datalist id="dl_sub"></datalist>
+      </div>
+      <div class="fg">
+        <label for="j_sector">القطاع</label>
+        <input class="fi" id="j_sector" list="dl_sector" maxlength="80" autocomplete="off">
+        <datalist id="dl_sector"></datalist>
+      </div>
+      <div class="fg">
+        <label for="j_wmgr">موقع العمل</label>
+        <input class="fi" id="j_wmgr" list="dl_names" maxlength="80" autocomplete="off">
+      </div>
+      <div class="fg">
+        <label for="j_mgr">المدير المباشر</label>
+        <input class="fi" id="j_mgr" list="dl_names" maxlength="80" autocomplete="off">
+        <datalist id="dl_names"></datalist>
+      </div>
+      <div class="firow">
+        <div class="fg">
+          <label for="j_salary">الراتب</label>
+          <input class="fi" id="j_salary" type="number" min="0" step="any" inputmode="decimal" dir="ltr" style="text-align:right">
+        </div>
+        <div class="fg">
+          <label for="j_raise">تاريخ آخر زيادة</label>
+          <input class="fi" id="j_raise" type="date">
+        </div>
+      </div>
+      <div class="firow">
+        <div class="fg">
+          <label for="j_hire"><span class="req">*</span>تاريخ التعيين</label>
+          <input class="fi" id="j_hire" type="date">
+        </div>
+        <div class="fg">
+          <label for="j_probe">نهاية فترة الاختبار</label>
+          <input class="fi" id="j_probe" type="date">
+        </div>
+      </div>
+      <div class="fg">
+        <label for="j_status"><span class="req">*</span>حالة الموظف الحالية</label>
+        <select class="fi" id="j_status"><option value="">— اختر —</option><option>على رأس العمل</option><option>تحت الاختبار</option><option>في إجازة</option><option>موقوف</option><option>منتهي الخدمة</option></select>
+      </div>
+      <button class="sbtn add" id="jSaveBtn" onclick="saveJob()">حفظ البيانات الوظيفية</button>
+      <button class="cbtn" id="jCancelBtn" onclick="cancelJobEdit()">إلغاء التعديل</button>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar">
+        <div class="tl">
+          <h3>البيانات الوظيفية</h3>
+          <p id="jSub">جاري التحميل…</p>
+        </div>
+        <div class="tr">
+          <div class="sbox">
+            <span class="si">🔍</span>
+            <input id="jq" placeholder="ابحث بالرقم أو الاسم أو المسمى الوظيفي أو الإدارة" oninput="renderJob()" autocomplete="off">
+          </div>
+          <button class="abtn g" onclick="exportJob()">📊 تصدير Excel</button>
+        </div>
+      </div>
+
+      <div class="twrap scroll">
+        <table>
+          <thead>
+            <tr><th>الرقم الوظيفي</th><th>الاسم</th><th>المسمى الوظيفي</th><th>نوع العمل</th><th>الإدارة الرئيسية</th><th>الإدارة الفرعية</th><th>القطاع</th><th>مدير العمل</th><th>المدير المباشر</th><th>الراتب</th><th>تاريخ التعيين</th><th>آخر زيادة</th><th>الحالة</th><th></th></tr>
+          </thead>
+          <tbody id="jbody"></tbody>
+        </table>
+        <div id="jEmpty"></div>
+      </div>
+    </main>
+  </div>
+  <!-- ═══ القسم 3: بيانات التعاقد والأجور ═══ -->
+  <div class="sbar" data-sec="contract" style="display:none">
+    <div class="chip"><div class="dot" style="background:var(--gold)"></div><span class="sn" id="csTotal">0</span><span class="sl">عقود مسجلة</span></div>
+    <div class="chip"><div class="dot" style="background:var(--green)"></div><span class="sn" id="csPay">0</span><span class="sl">إجمالي الرواتب الشهرية</span></div>
+    <div class="chip"><div class="dot" style="background:var(--orange)"></div><span class="sn" id="csMissing">0</span><span class="sl">موظفين لسه ملهمش بيانات تعاقد</span></div>
+    <div class="chip"><div class="dot" style="background:var(--blue)"></div><span class="sn" id="csShown">0</span><span class="sl">نتائج العرض</span></div>
+  </div>
+
+  <div class="abody" data-sec="contract" style="display:none">
+    <aside class="sidebar">
+      <div class="fhead">
+        <h2 id="cFormTitle">➕ بيانات تعاقد وأجور</h2>
+        <span class="fbadge" id="cFormBadge">إضافة</span>
+      </div>
+
+      <div class="fg">
+        <label for="c_no"><span class="req">*</span>الرقم الوظيفي</label>
+        <input class="fi" id="c_no" list="dl_emp" dir="ltr" style="text-align:right" autocomplete="off" maxlength="20">
+        <div class="hint" id="cNoHint">اكتب الرقم أو اختاره من القايمة. لازم يكون الموظف متسجل في البيانات الشخصية.</div>
+      </div>
+      <div class="fg">
+        <label for="c_name">الاسم</label>
+        <input class="fi" id="c_name" readonly placeholder="بيظهر تلقائياً من البيانات الشخصية">
+      </div>
+
+      <div class="sec">بيانات العقد</div>
+      <div class="fg">
+        <label for="c_type"><span class="req">*</span>نوع العقد</label>
+        <select class="fi" id="c_type"><option value="">— اختر —</option><option>محدد المدة</option><option>غير محدد المدة</option><option>سنوي</option><option>عقد استشاري</option></select>
+      </div>
+      <div class="firow">
+        <div class="fg">
+          <label for="c_start"><span class="req">*</span>بداية العقد</label>
+          <input class="fi" id="c_start" type="date">
+        </div>
+        <div class="fg">
+          <label for="c_end"><span class="req" id="c_endReq">*</span>نهاية العقد</label>
+          <input class="fi" id="c_end" type="date">
+        </div>
+      </div>
+
+      <div class="sec">هيكل الراتب</div>
+      <div class="fg">
+        <label for="c_basic"><span class="req">*</span>الراتب الأساسي</label>
+        <input class="fi" id="c_basic" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+      </div>
+      <div class="firow">
+        <div class="fg">
+          <label for="c_housing">بدل سكن</label>
+          <input class="fi" id="c_housing" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+        <div class="fg">
+          <label for="c_transport">بدل انتقال</label>
+          <input class="fi" id="c_transport" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+      </div>
+      <div class="firow">
+        <div class="fg">
+          <label for="c_meal">بدل طعام</label>
+          <input class="fi" id="c_meal" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+        <div class="fg">
+          <label for="c_nature">بدل طبيعة عمل</label>
+          <input class="fi" id="c_nature" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+      </div>
+      <div class="sumbox"><span>إجمالي البدلات</span><b id="c_allow_total">0</b></div>
+      <div class="sumbox big"><span>إجمالي الراتب</span><b id="c_total">0</b></div>
+
+      <div class="sec">بيانات الحساب البنكي</div>
+      <div class="fg">
+        <label for="c_bank">اسم البنك</label>
+        <input class="fi" id="c_bank" list="dl_bank" maxlength="60" autocomplete="off">
+        <datalist id="dl_bank"></datalist>
+      </div>
+      <div class="fg">
+        <label for="c_branch">الفرع</label>
+        <input class="fi" id="c_branch" maxlength="60" autocomplete="off">
+      </div>
+      <div class="fg">
+        <label for="c_acc">رقم الحساب البنكي</label>
+        <input class="fi" id="c_acc" dir="ltr" style="text-align:right" maxlength="40" autocomplete="off">
+        <div class="hint">أرقام (أو IBAN). الفراغات والشرطات بتتشال تلقائي.</div>
+      </div>
+
+      <button class="sbtn add" id="cSaveBtn" onclick="saveContract()">حفظ بيانات التعاقد</button>
+      <button class="cbtn" id="cCancelBtn" onclick="cancelContractEdit()">إلغاء التعديل</button>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar">
+        <div class="tl">
+          <h3>بيانات التعاقد والأجور</h3>
+          <p id="cSub">جاري التحميل…</p>
+        </div>
+        <div class="tr">
+          <div class="sbox">
+            <span class="si">🔍</span>
+            <input id="cq" placeholder="ابحث بالرقم أو الاسم أو نوع العقد أو البنك" oninput="renderContract()" autocomplete="off">
+          </div>
+          <button class="abtn g" onclick="exportContract()">📊 تصدير Excel</button>
+        </div>
+      </div>
+
+      <div class="twrap ctw">
+        <table>
+          <thead>
+            <tr><th>الرقم الوظيفي</th><th>الاسم</th><th>نوع العقد</th><th>بداية العقد</th><th>نهاية العقد</th><th>الأساسي</th><th>البدلات</th><th>إجمالي الراتب</th><th>البنك</th><th></th></tr>
+          </thead>
+          <tbody id="cbody"></tbody>
+        </table>
+        <div id="cEmpty"></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="sbar" data-sec="personal">
+    <div class="chip"><div class="dot" style="background:var(--gold)"></div><span class="sn" id="stTotal">0</span><span class="sl">إجمالي الموظفين</span></div>
+    <div class="chip"><div class="dot" style="background:var(--blue)"></div><span class="sn" id="stGov">0</span><span class="sl">محافظات</span></div>
+    <div class="chip"><div class="dot" style="background:var(--green)"></div><span class="sn" id="stShown">0</span><span class="sl">نتائج العرض</span></div>
+  </div>
+
+  <div class="abody" data-sec="personal">
+    <aside class="sidebar">
+      <div class="fhead">
+        <h2 id="formTitle">➕ موظف جديد</h2>
+        <span class="fbadge" id="formBadge">إضافة</span>
+      </div>
+
+      <div class="fg">
+        <label for="f_no"><span class="req">*</span>الرقم الوظيفي</label>
+        <input class="fi" id="f_no" dir="ltr" style="text-align:right" inputmode="text" maxlength="20" autocomplete="off">
+        <div class="hint" id="noHint">أرقام فقط. مينفعش يتغير بعد الحفظ.</div>
+      </div>
+      <div class="fg">
+        <label for="f_name"><span class="req">*</span>الاسم</label>
+        <input class="fi" id="f_name" maxlength="80" autocomplete="off">
+      </div>
+      <div class="firow" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="fg">
+          <label for="f_cab">رقم الدولاب</label>
+          <input class="fi" id="f_cab" dir="ltr" style="text-align:right" maxlength="20" autocomplete="off">
+        </div>
+        <div class="fg">
+          <label for="f_drawer">رقم الدرج</label>
+          <input class="fi" id="f_drawer" dir="ltr" style="text-align:right" maxlength="20" autocomplete="off">
+        </div>
+        <div class="fg">
+          <label for="f_file">رقم الملف</label>
+          <input class="fi" id="f_file" dir="ltr" style="text-align:right" maxlength="20" autocomplete="off">
+        </div>
+      </div>
+        <div class="fg">
+          <label for="f_nid"><span class="req" id="reqNid">*</span>رقم البطاقة</label>
+          <input class="fi" id="f_nid" dir="ltr" style="text-align:right" autocomplete="off">
+          <div class="hint">14 رقم (للمصريين). تاريخ الميلاد بيتملى تلقائي منه.</div>
+        </div>
+        <div class="fg">
+          <label for="f_pass"><span class="req" id="reqPass" style="display:none">*</span>رقم جواز السفر</label>
+          <input class="fi" id="f_pass" dir="ltr" style="text-align:right" maxlength="12" autocomplete="off">
+          <div class="hint">حروف إنجليزي وأرقام. مطلوب لو الجنسية مش مصرية.</div>
+        </div>
+        <div class="fg">
+          <label for="f_nat"><span class="req">*</span>الجنسية</label>
+          <input class="fi" id="f_nat" list="dl_nat" maxlength="30" autocomplete="off">
+          <datalist id="dl_nat"><option value="مصري"></option><option value="سوداني"></option><option value="سوري"></option><option value="ليبي"></option><option value="يمني"></option><option value="فلسطيني"></option><option value="أردني"></option><option value="سعودي"></option></datalist>
+        </div>
+        <div class="fg">
+          <label for="f_dob"><span class="req">*</span>تاريخ الميلاد</label>
+          <input class="fi" id="f_dob" type="date">
+        </div>
+        <div class="fg">
+          <label for="f_gov"><span class="req">*</span>المحافظة</label>
+          <select class="fi" id="f_gov"></select>
+        </div>
+        <div class="fg">
+          <label for="f_village"><span class="req">*</span>القرية أو المنطقة</label>
+          <input class="fi" id="f_village" maxlength="80" autocomplete="off">
+        </div>
+        <div class="fg">
+          <label for="f_addr"><span class="req">*</span>العنوان بالكامل</label>
+          <textarea class="fi" id="f_addr" maxlength="300"></textarea>
+        </div>
+  
+        <div class="sec">البيانات الشخصية</div>
+        <div class="firow">
+          <div class="fg">
+            <label for="f_gender"><span class="req">*</span>الجنس</label>
+            <select class="fi" id="f_gender"><option value="">— اختر —</option><option>ذكر</option><option>أنثى</option></select>
+          </div>
+          <div class="fg">
+            <label for="f_marital"><span class="req">*</span>الحالة الاجتماعية</label>
+            <select class="fi" id="f_marital"><option value="">— اختر —</option><option>أعزب</option><option>متزوج</option><option>مطلق</option><option>أرمل</option></select>
+          </div>
+        </div>
+        <div class="fg" id="kidsBox" style="display:none">
+          <label for="f_kids">عدد الأبناء</label>
+          <input class="fi" id="f_kids" dir="ltr" style="text-align:right" autocomplete="off">
+        </div>
+        <div class="fg">
+          <label for="f_qual"><span class="req">*</span>المؤهل</label>
+          <input class="fi" id="f_qual" maxlength="80" autocomplete="off">
+        </div>
+        <div class="fg">
+          <label for="f_exp">الخبرات السابقة</label>
+          <textarea class="fi" id="f_exp" maxlength="600" style="min-height:70px"></textarea>
+        </div>
+        <div class="fg" id="milBox" style="display:none">
+          <label for="f_mil"><span class="req">*</span>الموقف من التجنيد</label>
+          <select class="fi" id="f_mil"><option value="">— اختر —</option><option>أدى الخدمة</option><option>معفى</option><option>مؤجل</option><option>لم يحن موعده</option><option>لا ينطبق</option></select>
+        </div>
+        <div class="fg">
+          <label for="f_religion">الديانة</label>
+          <select class="fi" id="f_religion"><option value="">— اختر —</option><option>مسلم</option><option>مسيحي</option><option>أخرى</option></select>
+        </div>
+  
+        <div class="sec">التواصل والمهارات</div>
+        <div class="fg">
+          <label for="f_phone">رقم الهاتف</label>
+          <input class="fi" id="f_phone" type="tel" dir="ltr" style="text-align:right" maxlength="20" autocomplete="off" inputmode="tel">
+        </div>
+        <div class="fg">
+          <label for="f_email">إيميل الموظف</label>
+          <input class="fi" id="f_email" type="email" dir="ltr" style="text-align:right" maxlength="80" autocomplete="off">
+        </div>
+        <div class="fg">
+          <label for="f_skills">المهارات</label>
+          <textarea class="fi" id="f_skills" maxlength="300" style="min-height:60px"></textarea>
+          <div class="hint">افصل بين المهارات بفاصلة ،</div>
+        </div>
+  
+        <div class="sec">المرفقات (PDF / صور)</div>
+        <div class="drop" id="drop" tabindex="0" role="button">
+          <div class="dic">📎</div>
+          اسحب الملفات هنا أو اضغط للاختيار
+          <div class="hint">PDF أو صور، حد أقصى 10 ميجا للملف</div>
+        </div>
+        <input type="file" id="f_files" accept="application/pdf,image/*" multiple hidden>
+        <div class="flist" id="flist"></div>
+  
+        <div class="sec">الصورة الشخصية</div>
+        <div class="photobox">
+          <div class="ph" id="photoPh" style="display:flex">مفيش صورة</div>
+          <img class="ph" id="photoImg" alt="" style="display:none">
+          <div class="phbtns">
+            <button type="button" class="abtn" id="photoBtn">📷 إضافة صورة شخصية</button>
+            <button type="button" class="abtn" id="photoDel" style="display:none">إزالة الصورة</button>
+          </div>
+          <input type="file" id="f_photo" accept="image/*" hidden>
+        </div>
+  
+        <div class="sec">الأوراق</div>
+        <div class="docs" id="docsBox"></div>
+        <div class="hint" style="margin-top:6px">اضغط على الورقة للتبديل بين ✓ موجودة و ✗ ناقصة</div><button class="sbtn add" id="saveBtn" onclick="save()">حفظ الموظف</button>
+      <button class="cbtn" id="cancelBtn" onclick="cancelEdit()">إلغاء التعديل</button>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar">
+        <div class="tl">
+          <h3>البيانات الاجتماعية الشخصية</h3>
+          <p id="subLine">جاري التحميل…</p>
+        </div>
+        <div class="tr">
+          <div class="sbox">
+            <span class="si">🔍</span>
+            <input id="q" placeholder="ابحث بالرقم الوظيفي أو الاسم" oninput="render()" autocomplete="off">
+          </div>
+          <button class="abtn g" onclick="exportExcel()">📊 تصدير Excel</button>
+        </div>
+      </div>
+
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr><th>الرقم الوظيفي</th><th>الاسم</th><th>المحافظة</th><th>القرية / المنطقة</th><th>العنوان</th><th>الأوراق</th><th></th></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div id="emptyBox"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- DETAILS MODAL -->
+<div class="ov" id="detailOv" onclick="if(event.target===this)closeDetail()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="mhdr"><h3 id="dTitle">بيانات الموظف</h3><button class="mcls" onclick="closeDetail()" aria-label="إغلاق">✕</button></div>
+    <div class="mbody" id="dBody"></div>
+    <div class="mfoot">
+      <button class="primary" onclick="editFromDetail()">تعديل</button>
+      <button class="danger" onclick="askDelete(detailKey)">حذف</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="ov" id="delOv" onclick="if(event.target===this)closeDel()">
+  <div class="modal" style="width:400px" role="alertdialog" aria-modal="true">
+    <div class="mhdr"><h3>تأكيد الحذف</h3><button class="mcls" onclick="closeDel()" aria-label="إغلاق">✕</button></div>
+    <div class="mbody"><p id="delMsg" style="font-size:13px;line-height:1.9;color:var(--mu)"></p></div>
+    <div class="mfoot">
+      <button onclick="closeDel()">رجوع</button>
+      <button class="danger" id="delConfirmBtn" onclick="confirmDelete()">حذف نهائي</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAILS MODAL (الوظيفي) -->
+<div class="ov" id="jDetailOv" onclick="if(event.target===this)closeJobDetail()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="mhdr"><h3 id="jdTitle">البيانات الوظيفية</h3><button class="mcls" onclick="closeJobDetail()" aria-label="إغلاق">✕</button></div>
+    <div class="mbody" id="jdBody"></div>
+    <div class="mfoot">
+      <button class="primary" onclick="closeJobDetail(); startJobEdit(jDetailKey)">تعديل</button>
+      <button onclick="openPersonalFromJob()">البيانات الشخصية</button>
+      <button class="danger" onclick="closeJobDetail(); askDeleteJob(jDetailKey)">حذف</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAILS MODAL (التعاقد والأجور) -->
+<div class="ov" id="cDetailOv" onclick="if(event.target===this)closeContractDetail()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="mhdr"><h3 id="cdTitle">بيانات التعاقد والأجور</h3><button class="mcls" onclick="closeContractDetail()" aria-label="إغلاق">✕</button></div>
+    <div class="mbody" id="cdBody"></div>
+    <div class="mfoot">
+      <button class="primary" onclick="closeContractDetail(); startContractEdit(cDetailKey)">تعديل</button>
+      <button onclick="openPersonalFromContract()">البيانات الشخصية</button>
+      <button class="danger" onclick="closeContractDetail(); askDeleteContract(cDetailKey)">حذف</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+/* ════ FIREBASE CONFIG — حط بيانات مشروع الأرشيف الجديد هنا ════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBPCguqWCF_4RVm5cgX-zATNx36suOW5Rc",
+  authDomain: "team-archive-a6db7.firebaseapp.com",
+  databaseURL: "https://team-archive-a6db7-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "team-archive-a6db7",
+  appId: "1:739915339378:web:e82d749944fd4094ce14eb"
+};
+const CONFIGURED = !String(firebaseConfig.apiKey).startsWith("PUT_");
+
+/* ════ CLOUDINARY (رفع الملفات) ════ */
+const CLOUDINARY = { cloudName: "sujzv2hi", uploadPreset: "team_archive" };
+const CLD_OK = !String(CLOUDINARY.cloudName).startsWith("PUT_");
+const MAX_FILE_MB = 10;
+
+const PAPERS = [
+  ["idCard","صورة البطاقة"],
+  ["criminal","الفيش الجنائي"],
+  ["qualification","أصل المؤهل"],
+  ["birthCert","أصل شهادة الميلاد"],
+  ["photo","الصورة الشخصية"],
+  ["military","أصل شهادة الخدمة العسكرية"],
+  ["workStub","كعب العمل"],
+  ["insuranceNo","الرقم التأميني"],
+  ["medical111","نموذج طبي 111"]
+];
+let FILES = [];   // مرفقات الفورم: محفوظ {name,url,type,size} أو لسه هيترفع {file,name,type,size}
+let DOCS = {};    // حالة الأوراق: { idCard:true, criminal:false, ... }
+let JOB = {};                                   // البيانات الوظيفية: { empNo: {...} }
+let jobRef = null, jobEditKey = null, jobSaving = false;
+let CONTRACT = {}, contractRef = null, conEditKey = null, conSaving = false, cDetailKey = null, delCon = false;
+const GOVERNORATES = ["القاهرة","الجيزة","الإسكندرية","القليوبية","الشرقية","الدقهلية","الغربية","المنوفية","البحيرة","كفر الشيخ","دمياط","بورسعيد","الإسماعيلية","السويس","شمال سيناء","جنوب سيناء","الفيوم","بني سويف","المنيا","أسيوط","سوهاج","قنا","الأقصر","أسوان","البحر الأحمر","الوادي الجديد","مطروح"];
+
+let auth, rtdb, personalRef;
+let DATA = {};            // { empNo: {empNo,name,address,governorate,village,...} }
+let loaded = false;
+let editKey = null;
+let detailKey = null;
+let delKey = null;
+let saving = false;
+
+/* ════ HELPERS ════ */
+const $ = id => document.getElementById(id);
+function esc(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function toLatinDigits(s){ return String(s).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)); }
+function norm(s){
+  return toLatinDigits(s).toLowerCase()
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
+    .replace(/[أإآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي")
+    .replace(/\s+/g, " ").trim();
+}
+let toastT;
+function toast(msg, isErr){
+  const t = $("toast"); t.textContent = msg; t.className = "show" + (isErr ? " err" : "");
+  clearTimeout(toastT); toastT = setTimeout(() => t.className = "", 3200);
+}
+function authMsg(code){
+  return ({
+    "auth/invalid-credential":"❌ البريد أو كلمة المرور غلط",
+    "auth/wrong-password":"❌ البريد أو كلمة المرور غلط",
+    "auth/user-not-found":"❌ البريد أو كلمة المرور غلط",
+    "auth/invalid-email":"❌ صيغة البريد غلط",
+    "auth/too-many-requests":"⏳ محاولات كتير، استنى شوية وجرب تاني",
+    "auth/network-request-failed":"📡 مفيش اتصال بالإنترنت",
+    "auth/user-disabled":"⛔ الحساب ده موقوف"
+  })[code] || "❌ تعذر تسجيل الدخول";
+}
+
+/* ════ THEME ════ */
+const savedTheme = localStorage.getItem("archiveTheme") || "dark";
+if(savedTheme === "light") document.body.classList.add("light");
+$("themeBtn").textContent = savedTheme === "light" ? "☀️" : "🌙";
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  const light = document.body.classList.contains("light");
+  localStorage.setItem("archiveTheme", light ? "light" : "dark");
+  $("themeBtn").textContent = light ? "☀️" : "🌙";
+}
+
+/* ════ AUTH (مؤقتاً متقفل — خليه true لما نرجع نشغل تسجيل الدخول) ════ */
+const REQUIRE_LOGIN = false;
+if(!CONFIGURED){
+  $("cfgWarn").style.display = "block";
+  if(!REQUIRE_LOGIN){
+    $("loginPage").style.display = "none";
+    $("app").style.display = "block";
+    $("userLabel").textContent = "Firebase غير مُعدّ";
+    document.querySelector(".logoutbtn").style.display = "none";
+    loaded = true; render();
+    toast("⚠️ حط إعدادات Firebase في الملف عشان الحفظ يشتغل", true);
+  }
+} else {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  rtdb = firebase.database();
+  personalRef = rtdb.ref("archive/personal");
+  if(REQUIRE_LOGIN){
+    auth.onAuthStateChanged(user => {
+      if(user){
+        $("loginPage").style.display = "none";
+        $("app").style.display = "block";
+        $("userLabel").textContent = user.email || "—";
+        startSync();
+      } else {
+        if(personalRef) personalRef.off();
+        loaded = false; DATA = {};
+        $("app").style.display = "none";
+        $("loginPage").style.display = "flex";
+      }
+    });
+  } else {
+    $("loginPage").style.display = "none";
+    $("app").style.display = "block";
+    $("userLabel").textContent = "بدون تسجيل دخول";
+    document.querySelector(".logoutbtn").style.display = "none";
+    startSync();
+  }
+}
+async function doLogin(){
+  if(!CONFIGURED){ $("loginErr").textContent = "⚠️ لازم تحط إعدادات Firebase الأول"; return; }
+  const em = $("emIn").value.trim(), pw = $("pwIn").value;
+  if(!em || !pw){ $("loginErr").textContent = "❌ اكتب البريد وكلمة المرور"; return; }
+  const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "جاري الدخول…";
+  try{
+    await auth.signInWithEmailAndPassword(em, pw);
+    $("pwIn").value = ""; $("loginErr").textContent = "";
+  }catch(e){
+    $("loginErr").textContent = authMsg(e.code);
+    $("pwIn").value = "";
+  }
+  btn.disabled = false; btn.textContent = "دخول";
+}
+function doLogout(){ auth.signOut(); }
+
+/* ════ REALTIME SYNC ════ */
+function startSync(){
+  startJobSync();
+  startContractSync();
+  personalRef.on("value", snap => {
+    DATA = snap.val() || {};
+    loaded = true;
+    render();
+  }, err => {
+    console.error(err);
+    loaded = true; DATA = {};
+    render();
+    toast("⛔ مفيش صلاحية قراءة. راجع Security Rules", true);
+  });
+}
+
+/* ════ FORM ════ */
+function fillGovSelects(){
+  $("f_gov").innerHTML = '<option value="">— اختر المحافظة —</option>' + GOVERNORATES.map(g => `<option>${esc(g)}</option>`).join("");
+}
+fillGovSelects();
+
+/* الجنسية مصري؟ / إظهار وإخفاء الخانات الشرطية (عدد الأبناء للمتزوج، التجنيد للذكور) */
+function isEgy(){ return /^مصر/.test(norm($("f_nat").value)); }
+function syncPersonalUI(){
+  const married = $("f_marital").value === "متزوج";
+  $("kidsBox").style.display = married ? "" : "none";
+  if(!married) $("f_kids").value = "";
+  $("milBox").style.display = $("f_gender").value === "ذكر" ? "" : "none";
+  const egy = isEgy();
+  $("reqNid").style.display = egy ? "" : "none";
+  $("reqPass").style.display = egy ? "none" : "";
+}
+["f_marital","f_gender"].forEach(id => $(id).addEventListener("change", syncPersonalUI));
+$("f_nat").addEventListener("input", syncPersonalUI);
+
+function clearForm(){
+  editKey = null;
+  ["f_no","f_name","f_nid","f_pass","f_dob","f_village","f_addr","f_qual","f_exp","f_kids","f_phone","f_email","f_skills","f_cab","f_drawer","f_file"].forEach(i => { $(i).value = ""; $(i).classList.remove("bad"); });
+  ["f_gov","f_gender","f_marital","f_religion","f_mil"].forEach(i => { $(i).value = ""; $(i).classList.remove("bad"); });
+  $("f_nat").value = "مصري"; $("f_nat").classList.remove("bad");
+  FILES = []; DOCS = {}; PHOTO = null;
+  renderFiles(); renderDocsForm(); renderPhoto(); syncPersonalUI();
+  $("f_no").readOnly = false;
+  $("noHint").style.display = "block";
+  $("formTitle").textContent = "➕ موظف جديد";
+  $("formBadge").textContent = "إضافة"; $("formBadge").classList.remove("edit");
+  $("saveBtn").textContent = "حفظ الموظف"; $("saveBtn").className = "sbtn add";
+  $("cancelBtn").style.display = "none";
+}
+function cancelEdit(){ clearForm(); toast("تم إلغاء التعديل"); }
+
+function startEdit(key){
+  const e = DATA[key]; if(!e) return;
+  closeDetail();
+  editKey = key;
+  $("f_no").value = e.empNo; $("f_no").readOnly = true;
+  $("noHint").style.display = "none";
+  $("f_name").value = e.name || ""; $("f_gov").value = e.governorate || "";
+  $("f_nid").value = e.nationalId || ""; $("f_pass").value = e.passportNo || "";
+  $("f_nat").value = e.nationality || "مصري"; $("f_dob").value = e.birthDate || "";
+  $("f_village").value = e.village || ""; $("f_addr").value = e.address || "";
+  $("f_gender").value = e.gender || ""; $("f_marital").value = e.marital || "";
+  $("f_qual").value = e.qualification || ""; $("f_exp").value = e.experience || "";
+  $("f_mil").value = e.militaryStatus || ""; $("f_religion").value = e.religion || "";
+  $("f_cab").value = e.cabinetNo || ""; $("f_drawer").value = e.drawerNo || ""; $("f_file").value = e.fileNo || ""; $("f_phone").value = e.phone || ""; $("f_email").value = e.email || ""; $("f_skills").value = e.skills || "";
+  syncPersonalUI();
+  if(e.marital === "متزوج") $("f_kids").value = (e.kids === undefined || e.kids === null) ? "" : e.kids;
+  FILES = (e.files ? Object.values(e.files) : []).map(f => ({...f}));
+  DOCS = {...(e.docs || {})};
+  PHOTO = (e.photo && e.photo.url) ? {name: e.photo.name || "", url: e.photo.url} : null;
+  renderFiles(); renderDocsForm(); renderPhoto();
+  $("formTitle").textContent = "✏️ تعديل موظف";
+  $("formBadge").textContent = "تعديل"; $("formBadge").classList.add("edit");
+  $("saveBtn").textContent = "حفظ التعديلات"; $("saveBtn").className = "sbtn save";
+  $("cancelBtn").style.display = "block";
+  $("f_name").focus();
+  window.scrollTo({top:0, behavior:"smooth"});
+}/* ── المرفقات ── */
+const safeUrl = u => /^https:\/\//i.test(u || "") ? u : "#";
+function fmtSize(b){ return b > 1048576 ? (b/1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b/1024)) + " KB"; }
+function renderFiles(){
+  $("flist").innerHTML = FILES.map((f, i) => `
+    <div class="fitem ${f.file ? "new" : ""}">
+      <span>${f.type === "application/pdf" ? "📄" : "🖼️"}</span>
+      <span class="fn" title="${esc(f.name)}">${esc(f.name)}</span>
+      <span class="fs">${fmtSize(f.size || 0)}${f.file ? " · جديد" : ""}</span>
+      ${f.url ? `<a href="${esc(safeUrl(f.url))}" target="_blank" rel="noopener">فتح</a>` : ""}
+      <button type="button" class="fx" data-i="${i}" title="إزالة" aria-label="إزالة">✕</button>
+    </div>`).join("");
+}
+function addFiles(list){
+  for(const f of list){
+    if(!(f.type === "application/pdf" || f.type.startsWith("image/"))){ toast("❌ " + f.name + ": المسموح PDF أو صور بس", true); continue; }
+    if(f.size > MAX_FILE_MB * 1048576){ toast("❌ " + f.name + ": أكبر من " + MAX_FILE_MB + " ميجا", true); continue; }
+    FILES.push({file:f, name:f.name, type:f.type, size:f.size});
+  }
+  renderFiles();
+}
+$("drop").addEventListener("click", () => $("f_files").click());
+$("drop").addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); $("f_files").click(); } });
+$("f_files").addEventListener("change", e => { addFiles([...e.target.files]); e.target.value = ""; });
+["dragenter","dragover"].forEach(ev => $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.add("over"); }));
+["dragleave","drop"].forEach(ev => $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.remove("over"); }));
+$("drop").addEventListener("drop", e => addFiles([...e.dataTransfer.files]));
+$("flist").addEventListener("click", e => {
+  const b = e.target.closest(".fx"); if(!b) return;
+  FILES.splice(+b.dataset.i, 1); renderFiles();
+});
+async function uploadFile(file){
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", CLOUDINARY.uploadPreset);
+  let res;
+  try{ res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/auto/upload`, {method:"POST", body:fd}); }
+  catch(_){ throw new Error("UPLOAD: مفيش اتصال بالإنترنت"); }
+  const j = await res.json().catch(() => ({}));
+  if(!res.ok || !j.secure_url) throw new Error("UPLOAD: " + ((j.error && j.error.message) || res.status));
+  return j.secure_url;
+}
+
+/* ── الأوراق ── */
+function renderDocsForm(){
+  $("docsBox").innerHTML = PAPERS.map(([k, label]) => {
+    const on = !!DOCS[k];
+    return `<button type="button" class="doc ${on ? "yes" : "no"}" data-k="${k}" role="checkbox" aria-checked="${on}"><span>${esc(label)}</span><span class="bx">${on ? "✓" : "✗"}</span></button>`;
+  }).join("");
+}
+$("docsBox").addEventListener("click", e => {
+  const b = e.target.closest(".doc"); if(!b) return;
+  const k = b.dataset.k;
+  DOCS[k] = !DOCS[k]; renderDocsForm();
+  $("docsBox").querySelector(`[data-k="${k}"]`).focus();
+});
+function docsCount(e){ const d = e.docs || {}; return PAPERS.filter(([k]) => d[k]).length; }
+function docsBadge(e){
+  const n = docsCount(e), t = PAPERS.length;
+  return `<span class="pbadge ${n === t ? "full" : n ? "part" : "none"}">${n}/${t}</span>`;
+}
+
+/* ── رقم البطاقة → تاريخ الميلاد (بطاقة مصرية: رقم 1 = القرن، ثم YYMMDD) ── */
+function dobFromNid(n){
+  if(!/^\d{14}$/.test(n)) return "";
+  const c = n[0] === "2" ? 1900 : n[0] === "3" ? 2000 : 0;
+  if(!c) return "";
+  const y = c + Number(n.slice(1, 3)), m = n.slice(3, 5), d = n.slice(5, 7);
+  const t = new Date(`${y}-${m}-${d}T00:00:00`);
+  return (t.getFullYear() === y && t.getMonth() + 1 === Number(m) && t.getDate() === Number(d)) ? `${y}-${m}-${d}` : "";
+}
+$("f_nid").addEventListener("input", () => {
+  const d = dobFromNid(toLatinDigits($("f_nid").value).replace(/\D/g, ""));
+  if(d) $("f_dob").value = d;
+});
+
+/* ── الصورة الشخصية ── */
+let PHOTO = null;   // null | {name,url} (محفوظة) | {file,name,type,size,preview} (لسه هتترفع)
+function thumb(u, w){
+  if(!/^https:\/\//i.test(u || "")) return "#";
+  return /\/upload\//.test(u) ? u.replace("/upload/", `/upload/w_${w},h_${w},c_fill,g_face/`) : u;
+}
+function renderPhoto(){
+  const img = $("photoImg"), ph = $("photoPh");
+  const src = PHOTO ? (PHOTO.preview || thumb(PHOTO.url, 160)) : "";
+  img.style.display = src ? "block" : "none";
+  ph.style.display = src ? "none" : "flex";
+  if(src) img.src = src; else img.removeAttribute("src");
+  $("photoDel").style.display = PHOTO ? "" : "none";
+  $("photoBtn").textContent = PHOTO ? "📷 تغيير الصورة" : "📷 إضافة صورة شخصية";
+}
+$("photoBtn").addEventListener("click", () => $("f_photo").click());
+$("f_photo").addEventListener("change", e => {
+  const f = e.target.files[0]; e.target.value = "";
+  if(!f) return;
+  if(!f.type.startsWith("image/")){ toast("❌ لازم تكون صورة", true); return; }
+  if(f.size > MAX_FILE_MB * 1048576){ toast("❌ الصورة أكبر من " + MAX_FILE_MB + " ميجا", true); return; }
+  if(PHOTO && PHOTO.preview) URL.revokeObjectURL(PHOTO.preview);
+  PHOTO = {file:f, name:f.name, type:f.type, size:f.size, preview:URL.createObjectURL(f)};
+  renderPhoto();
+});
+$("photoDel").addEventListener("click", () => {
+  if(PHOTO && PHOTO.preview) URL.revokeObjectURL(PHOTO.preview);
+  PHOTO = null; renderPhoto();
+});
+$("f_pass").addEventListener("input", () => {
+  const c = $("f_pass").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if(c !== $("f_pass").value) $("f_pass").value = c;
+});
+
+/* ── الحفظ ── */
+async function save(){
+  if(saving) return;
+  const v = id => $(id).value.trim();
+  const no = toLatinDigits(v("f_no"));
+  const name = v("f_name").replace(/\s+/g, " ");
+  const gov = $("f_gov").value, gender = $("f_gender").value, marital = $("f_marital").value, religion = $("f_religion").value;
+  const village = v("f_village"), addr = v("f_addr"), qual = v("f_qual"), exp = v("f_exp");
+  const phone = toLatinDigits(v("f_phone")), email = v("f_email"), skills = v("f_skills");
+  const cab = v("f_cab"), drawer = v("f_drawer"), fileNo = v("f_file");
+  const nid = toLatinDigits(v("f_nid")), dob = $("f_dob").value;
+  const nat = v("f_nat"), pass = v("f_pass").toUpperCase(), mil = $("f_mil").value, kids = $("f_kids").value;
+  const egy = isEgy();
+  const dupNid = n => n && Object.values(DATA).find(e => e && e.nationalId === n && e.empNo !== (editKey || no));
+  const dupPass = p => p && Object.values(DATA).find(e => e && e.passportNo === p && e.empNo !== (editKey || no));
+
+  ["f_no","f_name","f_nid","f_pass","f_nat","f_dob","f_gov","f_village","f_addr","f_gender","f_marital","f_kids","f_qual","f_mil","f_phone","f_email"].forEach(i => $(i).classList.remove("bad"));
+  const bad = []; let msg = "❌ كمّل الخانات المطلوبة";
+  if(!no) bad.push("f_no");
+  else if(!/^\d+$/.test(no)){ bad.push("f_no"); msg = "❌ الرقم الوظيفي: أرقام فقط"; }
+  if(!name) bad.push("f_name");
+  if(!nat) bad.push("f_nat");
+  if(egy){
+    if(!nid) bad.push("f_nid");
+    else if(!/^\d{14}$/.test(nid)){ bad.push("f_nid"); msg = "❌ رقم البطاقة لازم يكون 14 رقم"; }
+  } else if(nat){
+    if(!pass){ bad.push("f_pass"); msg = "❌ رقم جواز السفر مطلوب لغير المصريين"; }
+  }
+  if(!dob) bad.push("f_dob");
+  if(!gov) bad.push("f_gov");
+  if(!village) bad.push("f_village");
+  if(!addr) bad.push("f_addr");
+  if(!gender) bad.push("f_gender");
+  if(!marital) bad.push("f_marital");
+  if(!qual) bad.push("f_qual");
+  if(gender === "ذكر" && !mil) bad.push("f_mil");
+  if(!bad.length){
+    const nd = dobFromNid(nid);
+    if(pass && !/^[A-Z0-9]{6,12}$/.test(pass)){ bad.push("f_pass"); msg = "❌ رقم جواز السفر: حروف إنجليزي وأرقام (من 6 لـ 12)"; }
+    else if(egy && nd && nd !== dob){ bad.push("f_dob"); msg = "❌ تاريخ الميلاد مش مطابق لرقم البطاقة (" + nd + ")"; }
+    else if(dupNid(nid)){ bad.push("f_nid"); msg = "❌ رقم البطاقة ده مسجل لموظف تاني (رقم " + dupNid(nid).empNo + ")"; }
+    else if(dupPass(pass)){ bad.push("f_pass"); msg = "❌ رقم جواز السفر ده مسجل لموظف تاني (رقم " + dupPass(pass).empNo + ")"; }
+    else if(marital === "متزوج" && kids !== "" && Number(kids) > 20){ bad.push("f_kids"); msg = "❌ عدد الأبناء مش منطقي"; }
+    else if(phone && !/^\d{7,15}$/.test(phone)){ bad.push("f_phone"); msg = "❌ رقم الهاتف: أرقام فقط (من 7 لـ 15 رقم)"; }
+    else if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ bad.push("f_email"); msg = "❌ صيغة الإيميل مش صحيحة"; }
+  }
+  if(bad.length){ bad.forEach(i => $(i).classList.add("bad")); $(bad[0]).focus(); toast(msg, true); return; }
+
+  if(!personalRef){ toast("⚠️ Firebase مش متضبط. عدّل firebaseConfig الأول", true); return; }
+  const pending = FILES.filter(f => f.file);
+  if((pending.length || (PHOTO && PHOTO.file)) && !CLD_OK){ toast("⚠️ حط إعدادات Cloudinary الأول عشان ترفع الملفات", true); return; }
+
+  const who = (auth && auth.currentUser && auth.currentUser.email) || "بدون تسجيل";
+  const docs = {}; PAPERS.forEach(([k]) => docs[k] = !!DOCS[k]);
+  saving = true; $("saveBtn").disabled = true;
+  try{
+    let photo = null;
+    if(PHOTO){
+      if(PHOTO.file){ $("saveBtn").textContent = "جاري رفع الصورة…"; photo = {name: PHOTO.name, url: await uploadFile(PHOTO.file)}; }
+      else photo = {name: PHOTO.name || "", url: PHOTO.url};
+    }
+    const files = []; let n = 0;
+    for(const f of FILES){
+      if(f.file){
+        n++; $("saveBtn").textContent = `جاري رفع الملفات (${n}/${pending.length})…`;
+        files.push({name:f.name, url: await uploadFile(f.file), type:f.type, size:f.size});
+      } else files.push({name:f.name, url:f.url, type:f.type, size:f.size});
+    }
+    $("saveBtn").textContent = "جاري الحفظ…";
+    const fields = {
+      name, nationalId:nid, passportNo:pass, nationality:nat, birthDate:dob,
+      governorate:gov, village, address:addr,
+      gender, marital, kids: (marital === "متزوج" && kids !== "") ? Number(kids) : null,
+      qualification:qual, experience:exp, militaryStatus: gender === "ذكر" ? mil : "لا ينطبق",
+      religion, phone, email, skills, cabinetNo: cab, drawerNo: drawer, fileNo, photo, files: files.length ? files : null, docs
+    };
+    if(editKey){
+      await personalRef.child(editKey).update({...fields, updatedAt: firebase.database.ServerValue.TIMESTAMP, updatedBy: who});
+      toast("✅ تم حفظ التعديلات");
+    } else {
+      const res = await personalRef.child(no).transaction(cur => {
+        if(cur !== null) return;   // موجود قبل كده → إلغاء
+        return {...fields, empNo: no, createdAt: Date.now(), createdBy: who};
+      }, undefined, false);
+      if(!res.committed){
+        $("f_no").classList.add("bad"); $("f_no").focus();
+        toast("❌ الرقم الوظيفي ده متسجل قبل كده", true);
+        return;
+      }
+      toast("✅ تم إضافة الموظف");
+    }
+    clearForm();
+  }catch(e){
+    console.error(e);
+    const m = String(e.message || "");
+    toast(m.startsWith("UPLOAD") ? "❌ فشل رفع الملف: " + m.replace(/^UPLOAD:\s*/, "")
+        : e.code === "PERMISSION_DENIED" ? "⛔ مفيش صلاحية كتابة. راجع Security Rules"
+        : "❌ حصل خطأ في الحفظ: " + m.slice(0, 80), true);
+  }finally{
+    saving = false; $("saveBtn").disabled = false;
+    $("saveBtn").textContent = editKey ? "حفظ التعديلات" : "حفظ الموظف";
+  }
+}
+/* ════ LIST / SEARCH ════ */
+function filteredList(){
+  const q = norm($("q").value);
+  return Object.values(DATA)
+    .filter(e => e && e.empNo)
+    .filter(e => !q || norm(e.empNo).includes(q) || norm(e.name).includes(q))
+    .sort((a, b) => String(a.empNo).localeCompare(String(b.empNo), "en", {numeric:true}));
+}
+function render(){
+  renderJob();
+  renderContract();
+  const all = Object.values(DATA).filter(e => e && e.empNo);
+  const list = filteredList();
+  $("stTotal").textContent = all.length;
+  $("stGov").textContent = new Set(all.map(e => e.governorate)).size;
+  $("stShown").textContent = list.length;
+  $("subLine").textContent = loaded ? `${list.length} من ${all.length} موظف` : "جاري التحميل…";
+
+  const tb = $("tbody"), eb = $("emptyBox");
+  if(!loaded){
+    tb.innerHTML = ""; eb.innerHTML = '<div class="empty"><div class="spinner"></div>جاري تحميل الأرشيف…</div>'; return;
+  }
+  if(!list.length){
+    tb.innerHTML = "";
+    eb.innerHTML = all.length
+      ? '<div class="empty"><div class="eic">🔎</div><b>مفيش نتائج مطابقة</b>جرب رقم وظيفي أو اسم تاني.</div>'
+      : '<div class="empty"><div class="eic">🗂️</div><b>الأرشيف فاضي</b>ضيف أول موظف من الفورم اللي على الجنب.</div>';
+    return;
+  }
+  eb.innerHTML = "";
+  tb.innerHTML = list.map(e => `
+    <tr data-k="${esc(e.empNo)}">
+      <td class="empno">${esc(e.empNo)}</td>
+      <td class="ename">${e.photo && e.photo.url ? `<img class="av" src="${esc(thumb(e.photo.url, 52))}" alt="">` : ""}${esc(e.name)}</td>
+      <td><span class="gov">${esc(e.governorate)}</span></td>
+      <td>${esc(e.village)}</td>
+      <td class="addr" title="${esc(e.address)}">${esc(e.address)}</td>
+      <td>${docsBadge(e)}</td>
+      <td><div class="rowact">
+        <button class="rbtn" data-act="edit" title="تعديل">✏️</button>
+        <button class="rbtn del" data-act="del" title="حذف">🗑️</button>
+      </div></td>
+    </tr>`).join("");
+}
+$("tbody").addEventListener("click", ev => {
+  const tr = ev.target.closest("tr"); if(!tr) return;
+  const key = tr.dataset.k;
+  const act = ev.target.closest("[data-act]")?.dataset.act;
+  if(act === "edit") startEdit(key);
+  else if(act === "del") askDelete(key);
+  else openDetail(key);
+});
+
+/* ════ DETAILS ════ */
+function openDetail(key){
+  const e = DATA[key]; if(!e) return;
+  detailKey = key;
+  $("dTitle").textContent = e.name;
+  const fd = d => d ? new Date(d + "T00:00:00").toLocaleDateString("ar-EG") : "—";
+  const rows = [
+    ["الرقم الوظيفي", e.empNo], ["الاسم", e.name], ["رقم الدولاب", e.cabinetNo], ["رقم الدرج", e.drawerNo], ["رقم الملف", e.fileNo], ["رقم البطاقة", e.nationalId], ["رقم جواز السفر", e.passportNo],
+    ["الجنسية", e.nationality], ["تاريخ الميلاد", fd(e.birthDate)], ["الجنس", e.gender], ["الديانة", e.religion],
+    ["الحالة الاجتماعية", e.marital]
+  ];
+  if(e.marital === "متزوج") rows.push(["عدد الأبناء", (e.kids === undefined || e.kids === null) ? "" : String(e.kids)]);
+  rows.push(
+    ["المؤهل", e.qualification], ["الخبرات السابقة", e.experience], ["الموقف من التجنيد", e.militaryStatus],
+    ["المحافظة", e.governorate], ["القرية / المنطقة", e.village], ["العنوان بالكامل", e.address],
+    ["رقم الهاتف", e.phone], ["الإيميل", e.email], ["المهارات", e.skills]
+  );
+  if(e.createdBy) rows.push(["أضافه", e.createdBy]);
+  if(e.createdAt) rows.push(["تاريخ الإضافة", new Date(e.createdAt).toLocaleDateString("ar-EG")]);
+  let html = (e.photo && e.photo.url ? `<img class="avl" src="${esc(thumb(e.photo.url, 240))}" alt="">` : "")
+    + rows.map(([k, v]) => `<div class="drow"><span class="k">${esc(k)}</span><span class="v">${esc(v || "—")}</span></div>`).join("");
+
+  const files = e.files ? Object.values(e.files) : [];
+  html += `<div class="dsub">المرفقات (${files.length})</div>` + (files.length
+    ? files.map(f => `<div class="dpap"><span>${f.type === "application/pdf" ? "📄" : "🖼️"}</span><a href="${esc(safeUrl(f.url))}" target="_blank" rel="noopener">${esc(f.name)}</a></div>`).join("")
+    : '<div class="dpap" style="color:var(--mu)">مفيش مرفقات</div>');
+
+  const d = e.docs || {};
+  html += `<div class="dsub">الأوراق (${docsCount(e)}/${PAPERS.length})</div>` + PAPERS.map(([k, label]) =>
+    `<div class="dpap"><span style="color:${d[k] ? "var(--green)" : "var(--red)"};font-weight:900">${d[k] ? "✓" : "✗"}</span>${esc(label)}</div>`).join("");
+  $("dBody").innerHTML = html;
+  $("detailOv").classList.add("open");
+}
+function closeDetail(){ $("detailOv").classList.remove("open"); }
+function editFromDetail(){ if(detailKey) startEdit(detailKey); }
+
+/* ════ DELETE ════ */
+let delJob = false;
+function askDelete(key){
+  const e = DATA[key]; if(!e) return;
+  closeDetail();
+  delKey = key; delJob = false;
+  $("delMsg").textContent = `هتحذف "${e.name}" (رقم ${e.empNo}) نهائياً من الأرشيف${JOB[key] ? " مع بياناته الوظيفية" : ""}${CONTRACT[key] ? " وبيانات التعاقد والأجور" : ""}. العملية دي مينفعش ترجع فيها.`;
+  $("delOv").classList.add("open");
+}
+function askDeleteJob(key){
+  const e = DATA[key];
+  delKey = key; delJob = true;
+  $("delMsg").textContent = `هتحذف البيانات الوظيفية للموظف "${e ? e.name : key}" (رقم ${key}) بس. بياناته الشخصية هتفضل زي ما هي.`;
+  $("delOv").classList.add("open");
+}
+function closeDel(){ $("delOv").classList.remove("open"); delKey = null; delJob = false; delCon = false; }
+async function confirmDelete(){
+  if(!delKey) return;
+  const key = delKey, onlyJob = delJob;
+  try{
+    if(delCon){
+      await contractRef.child(key).remove();
+    } else if(onlyJob){
+      await jobRef.child(key).remove();
+    } else {
+      await rtdb.ref("archive").update({["personal/" + key]: null, ["job/" + key]: null, ["contract/" + key]: null});
+      if(editKey === key) clearForm();
+    }
+    if(jobEditKey === key && !delCon) clearJobForm();
+    if(conEditKey === key && (delCon || !onlyJob)) clearContractForm();
+    toast("🗑️ تم الحذف");
+  }catch(e){
+    toast(e.code === "PERMISSION_DENIED" ? "⛔ مفيش صلاحية حذف" : "❌ حصل خطأ في الحذف", true);
+  }
+  closeDel();
+}
+
+/* ════ EXPORT ════ */
+function exportExcel(){
+  const list = filteredList();
+  if(!list.length){ toast("مفيش بيانات للتصدير", true); return; }
+  const rows = list.map(e => {
+    const r = {
+      "الرقم الوظيفي": e.empNo, "الاسم": e.name, "رقم الدولاب": e.cabinetNo || "", "رقم الدرج": e.drawerNo || "", "رقم الملف": e.fileNo || "", "رقم البطاقة": e.nationalId || "", "رقم جواز السفر": e.passportNo || "",
+      "الجنسية": e.nationality || "", "تاريخ الميلاد": e.birthDate || "", "الجنس": e.gender || "", "الديانة": e.religion || "",
+      "الحالة الاجتماعية": e.marital || "", "عدد الأبناء": (e.kids === undefined || e.kids === null) ? "" : e.kids,
+      "المؤهل": e.qualification || "", "الخبرات السابقة": e.experience || "", "الموقف من التجنيد": e.militaryStatus || "",
+      "المحافظة": e.governorate, "القرية / المنطقة": e.village, "العنوان بالكامل": e.address,
+      "رقم الهاتف": e.phone || "", "الإيميل": e.email || "", "المهارات": e.skills || "",
+      "عدد المرفقات": e.files ? Object.keys(e.files).length : 0
+    };
+    PAPERS.forEach(([k, label]) => r[label] = (e.docs && e.docs[k]) ? "✓" : "✗");
+    return r;
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws["!cols"] = [14,28,12,12,14,16,16,12,13,8,10,14,10,20,30,16,16,22,48,16,26,30,12].concat(PAPERS.map(() => 16)).map(w => ({wch:w}));
+  ws["!views"] = [{rightToLeft:true}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "البيانات الشخصية");
+  XLSX.writeFile(wb, "employees_personal_" + new Date().toISOString().slice(0,10) + ".xlsx");
+}
+/* ════ حماية الواجهة (كليك يمين / F12 / Ctrl+U) — خليها false وقت التطوير ════ */
+const LOCK_UI = true;
+if(LOCK_UI){
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("keydown", e => {
+    const mod = e.ctrlKey || e.metaKey;
+    const devKey = e.key === "F12"
+      || (mod && e.shiftKey && ["KeyI","KeyJ","KeyC"].includes(e.code))
+      || (mod && e.code === "KeyU")
+      || (e.metaKey && e.altKey && ["KeyI","KeyJ","KeyC","KeyU"].includes(e.code));
+    if(devKey){ e.preventDefault(); e.stopPropagation(); }
+  }, true);
+}
+
+/* ════ خانات الأرقام: أرقام فقط (بتحوّل الأرقام العربي لإنجليزي وبتمسح أي حرف أو رمز) ════ */
+[["f_no",20],["f_nid",14],["f_kids",2],["f_phone",15],["j_no",20],["j_salary",12]].forEach(([id, max]) => {
+  const el = $(id);
+  if(el.type === "number") el.type = "text";
+  el.setAttribute("inputmode", "numeric");
+  el.maxLength = max;
+  el.addEventListener("input", () => {
+    const c = toLatinDigits(el.value).replace(/\D/g, "");
+    if(c !== el.value) el.value = c;
+  });
+});
+
+/* ════ شريط الحالة ════ */
+function tickClock(){
+  const d = new Date();
+  const t = d.toLocaleTimeString("en-US", {hour:"numeric", minute:"2-digit", hour12:true}).replace(/\s?AM/, " ص").replace(/\s?PM/, " م");
+  $("sbTime").textContent = d.toLocaleDateString("en-GB") + "  " + t;
+  $("sbTime").dir = "ltr";
+}
+tickClock(); setInterval(tickClock, 30000);
+if(rtdb){
+  rtdb.ref(".info/connected").on("value", s => {
+    const on = !!s.val();
+    $("statusbar").classList.toggle("on", on);
+    $("sbConn").textContent = on ? "متصل بقاعدة البيانات" : "غير متصل";
+  });
+} else {
+  $("sbConn").textContent = "Firebase غير مُعدّ";
+}
+
+/* ════ كارت تفاصيل السجل الوظيفي ════ */
+let jDetailKey = null;
+function openJobDetail(key){
+  const j = JOB[key]; if(!j) return;
+  const e = empOf(key) || {};
+  jDetailKey = key;
+  $("jdTitle").textContent = e.name || ("رقم " + key);
+  const hasSal = j.salary !== null && j.salary !== undefined && j.salary !== "" && Number.isFinite(Number(j.salary));
+  const rows = [
+    ["الرقم الوظيفي", key], ["الاسم", e.name || "⚠️ مش في البيانات الشخصية"],
+    ["رقم التأمين", j.insuranceNo], ["المسمى الوظيفي", j.jobTitle], ["نوع العمل", j.workType],
+    ["الإدارة الرئيسية", j.mainDept], ["الإدارة الفرعية", j.subDept], ["القطاع", j.sector],
+    ["مدير العمل", j.workManager], ["المدير المباشر", j.directManager],
+    ["الراتب", hasSal ? Number(j.salary).toLocaleString("en-US") : ""],
+    ["تاريخ التعيين", j.hireDate], ["نهاية فترة الاختبار", j.probationEnd],
+    ["تاريخ آخر زيادة", j.lastRaiseDate], ["حالة الموظف", j.status]
+  ];
+  if(j.createdBy) rows.push(["أضافه", j.createdBy]);
+  if(j.createdAt) rows.push(["تاريخ الإضافة", new Date(j.createdAt).toLocaleDateString("ar-EG")]);
+  $("jdBody").innerHTML = (e.photo && e.photo.url ? `<img class="avl" src="${esc(thumb(e.photo.url, 240))}" alt="">` : "")
+    + rows.map(([k, v]) => `<div class="drow"><span class="k">${esc(k)}</span><span class="v">${esc(v || "—")}</span></div>`).join("");
+  $("jDetailOv").classList.add("open");
+}
+function closeJobDetail(){ $("jDetailOv").classList.remove("open"); }
+function openPersonalFromJob(){
+  const k = jDetailKey; closeJobDetail();
+  showSection("personal");
+  if(empOf(k)) openDetail(k);
+}
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeJobDetail(); });
+/* ════════════ القسم 2: البيانات الوظيفية ════════════ */
+function empOf(k){ return Object.prototype.hasOwnProperty.call(DATA, k) ? DATA[k] : null; }
+
+function showSection(sec){
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.sec === sec));
+  document.querySelectorAll(".sbar[data-sec], .abody[data-sec]").forEach(el => { el.style.display = el.dataset.sec === sec ? "" : "none"; });
+  if(sec === "job") renderJob();
+  if(sec === "contract") renderContract();
+}
+$("tabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if(b) showSection(b.dataset.sec); });
+
+function startJobSync(){
+  if(!rtdb) return;
+  if(jobRef) jobRef.off();
+  jobRef = rtdb.ref("archive/job");
+  jobRef.on("value", snap => { JOB = snap.val() || {}; renderJob(); },
+    err => { console.error(err); JOB = {}; renderJob(); toast("⛔ مفيش صلاحية قراءة البيانات الوظيفية. راجع Security Rules", true); });
+}
+
+/* اقتراحات (قايمة الموظفين + القيم المستخدمة قبل كده عشان الكتابة تتوحد) */
+function jobSuggest(){
+  const uniq = f => [...new Set(Object.values(JOB).map(j => String((j && j[f]) || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ar"));
+  const opts = arr => arr.map(v => `<option value="${esc(v)}"></option>`).join("");
+  const put = (id, html) => { const el = $(id); if(el._h !== html){ el._h = html; el.innerHTML = html; } };
+  const emps = Object.values(DATA).filter(e => e && e.empNo).sort((a, b) => String(a.empNo).localeCompare(String(b.empNo), "en", {numeric:true}));
+  put("dl_emp", emps.map(e => `<option value="${esc(e.empNo)}">${esc(e.name)}</option>`).join(""));
+  put("dl_names", emps.map(e => `<option value="${esc(e.name)}"></option>`).join(""));
+  put("dl_title", opts(uniq("jobTitle")));
+  put("dl_wtype", opts(uniq("workType")));
+  put("dl_dept", opts(uniq("mainDept")));
+  put("dl_sub", opts(uniq("subDept")));
+  put("dl_sector", opts(uniq("sector")));
+}
+
+function jobList(){
+  const q = norm($("jq").value);
+  return Object.keys(JOB).filter(k => JOB[k])
+    .map(k => ({...JOB[k], empNo: k, name: (empOf(k) || {}).name || ""}))
+    .filter(j => !q || norm([j.empNo, j.name, j.jobTitle, j.workType, j.mainDept, j.subDept, j.sector, j.workManager, j.directManager, j.status].join(" ")).includes(q))
+    .sort((a, b) => String(a.empNo).localeCompare(String(b.empNo), "en", {numeric:true}));
+}
+
+function stBadge(s){
+  const m = {"على رأس العمل":"on", "تحت الاختبار":"probation", "في إجازة":"leave", "موقوف":"susp", "منتهي الخدمة":"ended"};
+  return s ? `<span class="st ${m[s] || "ended"}">${esc(s)}</span>` : "—";
+}
+
+function renderJob(){
+  jobSuggest();
+  const all = Object.keys(JOB).filter(k => JOB[k]);
+  const list = jobList();
+  $("jsTotal").textContent = all.length;
+  $("jsDept").textContent = new Set(all.map(k => String(JOB[k].mainDept || "").trim()).filter(Boolean)).size;
+  $("jsMissing").textContent = Object.keys(DATA).filter(k => DATA[k] && DATA[k].empNo && !JOB[k]).length;
+  $("jsShown").textContent = list.length;
+  $("jSub").textContent = loaded ? `${list.length} من ${all.length} سجل` : "جاري التحميل…";
+
+  const tb = $("jbody"), eb = $("jEmpty");
+  if(!loaded){ tb.innerHTML = ""; eb.innerHTML = '<div class="empty"><div class="spinner"></div>جاري التحميل…</div>'; return; }
+  if(!list.length){
+    tb.innerHTML = "";
+    eb.innerHTML = all.length
+      ? '<div class="empty"><div class="eic">🔎</div><b>مفيش نتائج مطابقة</b>جرب كلمة تانية.</div>'
+      : '<div class="empty"><div class="eic">💼</div><b>مفيش بيانات وظيفية لسه</b>اختار موظف من الفورم اللي على الجنب وضيف بياناته.</div>';
+    return;
+  }
+  eb.innerHTML = "";
+  const cell = v => esc(v || "—");
+  tb.innerHTML = list.map(j => `
+    <tr data-k="${esc(j.empNo)}">
+      <td class="empno">${esc(j.empNo)}</td>
+      <td class="ename">${j.name ? esc(j.name) : '<span style="color:var(--orange)">⚠️ مش في البيانات الشخصية</span>'}</td>
+      <td>${cell(j.jobTitle)}</td>
+      <td>${cell(j.workType)}</td>
+      <td>${cell(j.mainDept)}</td>
+      <td>${cell(j.subDept)}</td>
+      <td>${cell(j.sector)}</td>
+      <td>${cell(j.workManager)}</td>
+      <td>${cell(j.directManager)}</td>
+      <td class="money">${j.salary !== null && j.salary !== undefined && j.salary !== "" && Number.isFinite(Number(j.salary)) ? Number(j.salary).toLocaleString("en-US") : "—"}</td>
+      <td>${cell(j.hireDate)}</td>
+      <td>${cell(j.lastRaiseDate)}</td>
+      <td>${stBadge(j.status)}</td>
+      <td><div class="rowact">
+        <button class="rbtn" data-act="edit" title="تعديل">✏️</button>
+        <button class="rbtn del" data-act="del" title="حذف">🗑️</button>
+      </div></td>
+    </tr>`).join("");
+}
+$("jbody").addEventListener("click", ev => {
+  const tr = ev.target.closest("tr"); if(!tr) return;
+  const k = tr.dataset.k, btn = ev.target.closest("[data-act]");
+  if(btn && btn.dataset.act === "del") askDeleteJob(k);
+  else if(btn && btn.dataset.act === "edit") startJobEdit(k);
+  else openJobDetail(k);
+});
+
+/* ── الفورم ── */
+function clearJobForm(){
+  jobEditKey = null;
+  ["j_no","j_name","j_ins","j_title","j_wtype","j_dept","j_sub","j_sector","j_wmgr","j_mgr","j_salary","j_raise","j_hire","j_probe"].forEach(i => { $(i).value = ""; $(i).classList.remove("bad"); });
+  $("j_status").value = "على رأس العمل"; $("j_status").classList.remove("bad");
+  $("j_no").readOnly = false; $("jNoHint").style.display = "block";
+  $("jFormTitle").textContent = "➕ بيانات وظيفية";
+  $("jFormBadge").textContent = "إضافة"; $("jFormBadge").classList.remove("edit");
+  $("jSaveBtn").textContent = "حفظ البيانات الوظيفية"; $("jSaveBtn").className = "sbtn add";
+  $("jCancelBtn").style.display = "none";
+}
+function cancelJobEdit(){ clearJobForm(); toast("تم إلغاء التعديل"); }
+function startJobEdit(key){
+  const j = JOB[key]; if(!j) return;
+  jobEditKey = key;
+  $("j_no").value = key; $("j_no").readOnly = true; $("jNoHint").style.display = "none";
+  $("j_name").value = (empOf(key) || {}).name || "";
+  $("j_ins").value = j.insuranceNo || ""; $("j_title").value = j.jobTitle || ""; $("j_wtype").value = j.workType || "";
+  $("j_dept").value = j.mainDept || ""; $("j_sub").value = j.subDept || "";
+  $("j_sector").value = j.sector || ""; $("j_wmgr").value = j.workManager || ""; $("j_mgr").value = j.directManager || "";
+  $("j_salary").value = (j.salary === null || j.salary === undefined) ? "" : j.salary;
+  $("j_raise").value = j.lastRaiseDate || "";
+  $("j_hire").value = j.hireDate || ""; $("j_probe").value = j.probationEnd || "";
+  $("j_status").value = j.status || "";
+  $("jFormTitle").textContent = "✏️ تعديل بيانات وظيفية";
+  $("jFormBadge").textContent = "تعديل"; $("jFormBadge").classList.add("edit");
+  $("jSaveBtn").textContent = "حفظ التعديلات"; $("jSaveBtn").className = "sbtn save";
+  $("jCancelBtn").style.display = "block";
+  $("j_title").focus();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+$("j_no").addEventListener("input", () => {
+  if(jobEditKey) return;
+  const no = toLatinDigits($("j_no").value).trim();
+  const e = empOf(no);
+  $("j_name").value = e ? e.name : "";
+  $("j_no").classList.toggle("bad", !!no && !e);
+});
+
+async function saveJob(){
+  if(jobSaving) return;
+  if(!jobRef){ toast("⚠️ Firebase مش متضبط. عدّل firebaseConfig الأول", true); return; }
+  const v = id => $(id).value.trim();
+  const no = jobEditKey || toLatinDigits(v("j_no"));
+  const emp = empOf(no);
+  const title = v("j_title");
+  const salaryRaw = $("j_salary").value, raise = $("j_raise").value;
+  const hire = $("j_hire").value, probe = $("j_probe").value, status = $("j_status").value;
+
+  ["j_no","j_title","j_salary","j_raise","j_hire","j_probe","j_status"].forEach(i => $(i).classList.remove("bad"));
+  const bad = []; let msg = "❌ كمّل الخانات المطلوبة";
+  if(!no) bad.push("j_no");
+  else if(!emp){ bad.push("j_no"); msg = "❌ الرقم ده مش متسجل في البيانات الشخصية. ضيف الموظف هناك الأول"; }
+  if(!title) bad.push("j_title");
+  if(!hire) bad.push("j_hire");
+  if(!status) bad.push("j_status");
+  if(!bad.length){
+    if(salaryRaw !== "" && !/^\d+$/.test(salaryRaw)){ bad.push("j_salary"); msg = "❌ الراتب: أرقام فقط"; }
+    else if(emp.birthDate && hire <= emp.birthDate){ bad.push("j_hire"); msg = "❌ تاريخ التعيين لازم يكون بعد تاريخ الميلاد (" + emp.birthDate + ")"; }
+    else if(probe && probe < hire){ bad.push("j_probe"); msg = "❌ نهاية فترة الاختبار قبل تاريخ التعيين"; }
+    else if(raise && raise < hire){ bad.push("j_raise"); msg = "❌ تاريخ آخر زيادة قبل تاريخ التعيين"; }
+  }
+  if(bad.length){ bad.forEach(i => $(i).classList.add("bad")); $(bad[0]).focus(); toast(msg, true); return; }
+
+  const who = (auth && auth.currentUser && auth.currentUser.email) || "بدون تسجيل";
+  const fields = {
+    jobTitle: title, insuranceNo: toLatinDigits(v("j_ins")), workType: v("j_wtype"), mainDept: v("j_dept"), subDept: v("j_sub"), sector: v("j_sector"),
+    workManager: v("j_wmgr"), directManager: v("j_mgr"),
+    salary: salaryRaw === "" ? null : Number(salaryRaw), lastRaiseDate: raise,
+    hireDate: hire, probationEnd: probe, status
+  };
+  jobSaving = true; $("jSaveBtn").disabled = true;
+  try{
+    if(jobEditKey){
+      await jobRef.child(jobEditKey).update({...fields, updatedAt: firebase.database.ServerValue.TIMESTAMP, updatedBy: who});
+      toast("✅ تم حفظ التعديلات");
+    } else {
+      const res = await jobRef.child(no).transaction(cur => {
+        if(cur !== null) return;   // موجود قبل كده → إلغاء
+        return {...fields, empNo: no, createdAt: Date.now(), createdBy: who};
+      }, undefined, false);
+      if(!res.committed){
+        $("j_no").classList.add("bad"); $("j_no").focus();
+        toast("❌ الموظف ده ليه بيانات وظيفية قبل كده. عدّلها من الجدول", true);
+        return;
+      }
+      toast("✅ تم حفظ البيانات الوظيفية");
+    }
+    clearJobForm();
+  }catch(e){
+    console.error(e);
+    toast(e.code === "PERMISSION_DENIED" ? "⛔ مفيش صلاحية كتابة. راجع Security Rules" : "❌ حصل خطأ في الحفظ: " + String(e.message || "").slice(0, 80), true);
+  }finally{
+    jobSaving = false; $("jSaveBtn").disabled = false;
+  }
+}
+
+function exportJob(){
+  const list = jobList();
+  if(!list.length){ toast("مفيش بيانات للتصدير", true); return; }
+  const rows = list.map(j => ({
+    "الرقم الوظيفي": j.empNo, "الاسم": j.name, "رقم التأمين": j.insuranceNo || "", "المسمى الوظيفي": j.jobTitle || "", "نوع العمل": j.workType || "",
+    "الإدارة الرئيسية": j.mainDept || "", "الإدارة الفرعية": j.subDept || "", "القطاع": j.sector || "",
+    "مدير العمل": j.workManager || "", "المدير المباشر": j.directManager || "",
+    "الراتب": (j.salary === null || j.salary === undefined) ? "" : j.salary,
+    "تاريخ التعيين": j.hireDate || "", "نهاية فترة الاختبار": j.probationEnd || "",
+    "تاريخ آخر زيادة": j.lastRaiseDate || "", "حالة الموظف": j.status || ""
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws["!cols"] = [14,28,16,24,18,22,22,18,22,22,12,14,18,16,16].map(w => ({wch:w}));
+  ws["!views"] = [{rightToLeft:true}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "البيانات الوظيفية");
+  XLSX.writeFile(wb, "employees_job_" + new Date().toISOString().slice(0,10) + ".xlsx");
+}
+/* ════════════ القسم 3: بيانات التعاقد والأجور ════════════ */
+const ALLOW_FIELDS = [["c_housing","housingAllowance","بدل سكن"],["c_transport","transportAllowance","بدل انتقال"],["c_meal","mealAllowance","بدل طعام"],["c_nature","natureAllowance","بدل طبيعة عمل"]];
+const MONEY_IDS = ["c_basic", ...ALLOW_FIELDS.map(a => a[0])];
+const BANKS = ["البنك الأهلي المصري","بنك مصر","البنك التجاري الدولي (CIB)","بنك القاهرة","بنك الإسكندرية","بنك QNB","بنك HSBC","بنك فيصل الإسلامي","بنك أبوظبي الأول","بنك الإمارات دبي الوطني","البنك العربي الأفريقي الدولي","بنك التعمير والإسكان","بنك قناة السويس","المصرف المتحد","بنك الكويت الوطني","بنك المشرق"];
+
+function startContractSync(){
+  if(!rtdb) return;
+  if(contractRef) contractRef.off();
+  contractRef = rtdb.ref("archive/contract");
+  contractRef.on("value", snap => { CONTRACT = snap.val() || {}; renderContract(); },
+    err => { console.error(err); CONTRACT = {}; renderContract(); toast("⛔ مفيش صلاحية قراءة بيانات التعاقد. راجع Security Rules", true); });
+}
+
+/* أرقام الفلوس: "" ← 0 ، رقم صحيح أو بكسور لحد رقمين ← رقم ، غير كده ← NaN */
+const r2 = n => Math.round((Number(n) || 0) * 100) / 100;
+const money = n => Number(n || 0).toLocaleString("en-US", {maximumFractionDigits: 2});
+function cNum(raw){
+  const t = toLatinDigits(raw).replace(/[,،\s]/g, "").replace(/٫/g, ".");
+  if(t === "") return 0;
+  return /^\d+(\.\d{1,2})?$/.test(t) ? Number(t) : NaN;
+}
+function cTotals(c){
+  const allow = r2(ALLOW_FIELDS.reduce((s, a) => s + (Number(c[a[1]]) || 0), 0));
+  return {allow, total: r2((Number(c.basicSalary) || 0) + allow)};
+}
+function calcContractTotals(){
+  const vals = MONEY_IDS.map(id => cNum($(id).value));
+  const ok = vals.every(n => !Number.isNaN(n));
+  const allow = ok ? r2(vals.slice(1).reduce((a, b) => a + b, 0)) : 0;
+  $("c_allow_total").textContent = money(allow);
+  $("c_total").textContent = money(ok ? r2(vals[0] + allow) : 0);
+}
+MONEY_IDS.forEach(id => $(id).addEventListener("input", calcContractTotals));
+
+function syncContractUI(){
+  const indef = $("c_type").value === "غير محدد المدة";
+  $("c_end").disabled = indef;
+  if(indef){ $("c_end").value = ""; $("c_end").classList.remove("bad"); }
+  $("c_endReq").style.display = indef ? "none" : "";
+}
+$("c_type").addEventListener("change", syncContractUI);
+
+$("c_no").addEventListener("input", () => {
+  if(conEditKey) return;
+  const no = toLatinDigits($("c_no").value).trim();
+  const e = empOf(no);
+  $("c_name").value = e ? e.name : "";
+  $("c_no").classList.toggle("bad", !!no && !e);
+});
+
+function clearContractForm(){
+  conEditKey = null;
+  ["c_no","c_name","c_start","c_end","c_basic","c_housing","c_transport","c_meal","c_nature","c_bank","c_branch","c_acc"].forEach(i => { $(i).value = ""; $(i).classList.remove("bad"); });
+  $("c_type").value = ""; $("c_type").classList.remove("bad");
+  $("c_no").readOnly = false; $("cNoHint").style.display = "block";
+  syncContractUI(); calcContractTotals();
+  $("cFormTitle").textContent = "➕ بيانات تعاقد وأجور";
+  $("cFormBadge").textContent = "إضافة"; $("cFormBadge").classList.remove("edit");
+  $("cSaveBtn").textContent = "حفظ بيانات التعاقد"; $("cSaveBtn").className = "sbtn add";
+  $("cCancelBtn").style.display = "none";
+}
+function cancelContractEdit(){ clearContractForm(); toast("تم إلغاء التعديل"); }
+
+function startContractEdit(key){
+  const c = CONTRACT[key]; if(!c) return;
+  conEditKey = key;
+  $("c_no").value = key; $("c_no").readOnly = true; $("cNoHint").style.display = "none";
+  $("c_name").value = (empOf(key) || {}).name || "";
+  $("c_type").value = c.contractType || "";
+  $("c_start").value = c.startDate || ""; $("c_end").value = c.endDate || "";
+  $("c_basic").value = c.basicSalary || "";
+  ALLOW_FIELDS.forEach(a => { $(a[0]).value = c[a[1]] || ""; });
+  $("c_bank").value = c.bankName || ""; $("c_branch").value = c.bankBranch || ""; $("c_acc").value = c.bankAccount || "";
+  syncContractUI(); calcContractTotals();
+  $("cFormTitle").textContent = "✏️ تعديل بيانات تعاقد وأجور";
+  $("cFormBadge").textContent = "تعديل"; $("cFormBadge").classList.add("edit");
+  $("cSaveBtn").textContent = "حفظ التعديلات"; $("cSaveBtn").className = "sbtn save";
+  $("cCancelBtn").style.display = "block";
+  $("c_type").focus();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+async function saveContract(){
+  if(conSaving) return;
+  if(!contractRef){ toast("⚠️ Firebase مش متضبط. عدّل firebaseConfig الأول", true); return; }
+  const v = id => $(id).value.trim();
+  const no = conEditKey || toLatinDigits(v("c_no"));
+  const emp = empOf(no);
+  const type = $("c_type").value, start = $("c_start").value, end = $("c_end").value;
+  const indef = type === "غير محدد المدة";
+  const basic = cNum($("c_basic").value);
+  const allow = ALLOW_FIELDS.map(a => cNum($(a[0]).value));
+  const bank = v("c_bank"), branch = v("c_branch");
+  const acc = toLatinDigits(v("c_acc")).replace(/[\s-]/g, "").toUpperCase();
+
+  ["c_no","c_type","c_start","c_end","c_basic","c_bank","c_acc"].concat(ALLOW_FIELDS.map(a => a[0])).forEach(i => $(i).classList.remove("bad"));
+  const bad = []; let msg = "❌ كمّل الخانات المطلوبة";
+  if(!no) bad.push("c_no");
+  else if(!emp){ bad.push("c_no"); msg = "❌ الرقم ده مش متسجل في البيانات الشخصية. ضيف الموظف هناك الأول"; }
+  if(!type) bad.push("c_type");
+  if(!start) bad.push("c_start");
+  if(!indef && !end) bad.push("c_end");
+  if(v("c_basic") === "") bad.push("c_basic");
+  if(!bad.length){
+    const badAllow = allow.findIndex(n => Number.isNaN(n));
+    if(Number.isNaN(basic)){ bad.push("c_basic"); msg = "❌ الراتب الأساسي: أرقام فقط (وينفع كسور لحد رقمين)"; }
+    else if(badAllow >= 0){ bad.push(ALLOW_FIELDS[badAllow][0]); msg = "❌ " + ALLOW_FIELDS[badAllow][2] + ": أرقام فقط (وينفع كسور لحد رقمين)"; }
+    else if(!indef && end < start){ bad.push("c_end"); msg = "❌ نهاية العقد قبل تاريخ البداية"; }
+    else if(emp.birthDate && start <= emp.birthDate){ bad.push("c_start"); msg = "❌ بداية العقد لازم تكون بعد تاريخ الميلاد (" + emp.birthDate + ")"; }
+    else if(acc && !bank){ bad.push("c_bank"); msg = "❌ اكتب اسم البنك مع رقم الحساب"; }
+    else if(acc && !/^[A-Z0-9]{6,34}$/.test(acc)){ bad.push("c_acc"); msg = "❌ رقم الحساب: أرقام (أو IBAN) من 6 لـ 34 خانة"; }
+  }
+  if(bad.length){ bad.forEach(i => $(i).classList.add("bad")); $(bad[0]).focus(); toast(msg, true); return; }
+
+  const who = (auth && auth.currentUser && auth.currentUser.email) || "بدون تسجيل";
+  const fields = {
+    contractType: type, startDate: start, endDate: indef ? "" : end,
+    basicSalary: basic, housingAllowance: allow[0], transportAllowance: allow[1], mealAllowance: allow[2], natureAllowance: allow[3],
+    bankName: bank, bankBranch: branch, bankAccount: acc
+  };
+  conSaving = true; $("cSaveBtn").disabled = true;
+  try{
+    if(conEditKey){
+      await contractRef.child(conEditKey).update({...fields, updatedAt: firebase.database.ServerValue.TIMESTAMP, updatedBy: who});
+      toast("✅ تم حفظ التعديلات");
+    } else {
+      const res = await contractRef.child(no).transaction(cur => {
+        if(cur !== null) return;   // موجود قبل كده → إلغاء
+        return {...fields, empNo: no, createdAt: Date.now(), createdBy: who};
+      }, undefined, false);
+      if(!res.committed){
+        $("c_no").classList.add("bad"); $("c_no").focus();
+        toast("❌ الموظف ده ليه بيانات تعاقد قبل كده. عدّلها من الجدول", true);
+        return;
+      }
+      toast("✅ تم حفظ بيانات التعاقد");
+    }
+    clearContractForm();
+  }catch(e){
+    console.error(e);
+    toast(e.code === "PERMISSION_DENIED" ? "⛔ مفيش صلاحية كتابة. راجع Security Rules" : "❌ حصل خطأ في الحفظ: " + String(e.message || "").slice(0, 80), true);
+  }finally{
+    conSaving = false; $("cSaveBtn").disabled = false;
+  }
+}
+
+function contractList(){
+  const q = norm($("cq").value);
+  return Object.keys(CONTRACT).filter(k => CONTRACT[k])
+    .map(k => ({...CONTRACT[k], empNo: k, name: (empOf(k) || {}).name || ""}))
+    .filter(c => !q || norm([c.empNo, c.name, c.contractType, c.bankName, c.bankBranch, c.bankAccount].join(" ")).includes(q))
+    .sort((a, b) => String(a.empNo).localeCompare(String(b.empNo), "en", {numeric:true}));
+}
+
+function renderContract(){
+  const used = [...new Set(Object.values(CONTRACT).map(c => String((c && c.bankName) || "").trim()).filter(Boolean))];
+  const dl = $("dl_bank"), h = [...new Set([...BANKS, ...used])].map(b => `<option value="${esc(b)}"></option>`).join("");
+  if(dl._h !== h){ dl._h = h; dl.innerHTML = h; }
+
+  const all = Object.keys(CONTRACT).filter(k => CONTRACT[k]);
+  const list = contractList();
+  $("csTotal").textContent = all.length;
+  $("csPay").textContent = money(all.reduce((s, k) => s + cTotals(CONTRACT[k]).total, 0));
+  $("csMissing").textContent = Object.keys(DATA).filter(k => DATA[k] && DATA[k].empNo && !CONTRACT[k]).length;
+  $("csShown").textContent = list.length;
+  $("cSub").textContent = loaded ? `${list.length} من ${all.length} سجل` : "جاري التحميل…";
+
+  const tb = $("cbody"), eb = $("cEmpty");
+  if(!loaded){ tb.innerHTML = ""; eb.innerHTML = '<div class="empty"><div class="spinner"></div>جاري التحميل…</div>'; return; }
+  if(!list.length){
+    tb.innerHTML = "";
+    eb.innerHTML = all.length
+      ? '<div class="empty"><div class="eic">🔎</div><b>مفيش نتائج مطابقة</b>جرب كلمة تانية.</div>'
+      : '<div class="empty"><div class="eic">💳</div><b>مفيش بيانات تعاقد لسه</b>اختار موظف من الفورم اللي على الجنب وضيف بياناته.</div>';
+    return;
+  }
+  eb.innerHTML = "";
+  const cell = x => esc(x || "—");
+  tb.innerHTML = list.map(c => {
+    const t = cTotals(c);
+    return `
+    <tr data-k="${esc(c.empNo)}">
+      <td class="empno">${esc(c.empNo)}</td>
+      <td class="ename">${c.name ? esc(c.name) : '<span style="color:var(--orange)">⚠️ مش في البيانات الشخصية</span>'}</td>
+      <td>${cell(c.contractType)}</td>
+      <td>${cell(c.startDate)}</td>
+      <td>${c.endDate ? esc(c.endDate) : (c.contractType === "غير محدد المدة" ? "مفتوح" : "—")}</td>
+      <td class="money">${money(c.basicSalary)}</td>
+      <td class="money">${money(t.allow)}</td>
+      <td class="money">${money(t.total)}</td>
+      <td>${cell(c.bankName)}</td>
+      <td><div class="rowact">
+        <button class="rbtn" data-act="edit" title="تعديل">✏️</button>
+        <button class="rbtn del" data-act="del" title="حذف">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+$("cbody").addEventListener("click", ev => {
+  const tr = ev.target.closest("tr"); if(!tr) return;
+  const k = tr.dataset.k, btn = ev.target.closest("[data-act]");
+  if(btn && btn.dataset.act === "del") askDeleteContract(k);
+  else if(btn && btn.dataset.act === "edit") startContractEdit(k);
+  else openContractDetail(k);
+});
+
+function openContractDetail(key){
+  const c = CONTRACT[key]; if(!c) return;
+  const e = empOf(key) || {};
+  cDetailKey = key;
+  $("cdTitle").textContent = e.name || ("رقم " + key);
+  const t = cTotals(c);
+  const row = a => `<div class="drow"><span class="k">${esc(a[0])}</span><span class="v">${esc(a[1] || "—")}</span></div>`;
+  const head = [
+    ["الرقم الوظيفي", key], ["الاسم", e.name || "⚠️ مش في البيانات الشخصية"],
+    ["نوع العقد", c.contractType], ["بداية العقد", c.startDate],
+    ["نهاية العقد", c.endDate || (c.contractType === "غير محدد المدة" ? "مفتوح (غير محدد المدة)" : "")]
+  ];
+  const sal = [["الراتب الأساسي", money(c.basicSalary)]].concat(
+    ALLOW_FIELDS.map(a => [a[2], money(c[a[1]])]),
+    [["إجمالي البدلات", money(t.allow)], ["إجمالي الراتب", money(t.total)]]);
+  const bank = [["اسم البنك", c.bankName], ["الفرع", c.bankBranch], ["رقم الحساب البنكي", c.bankAccount]];
+  const meta = [];
+  if(c.createdBy) meta.push(["أضافه", c.createdBy]);
+  if(c.createdAt) meta.push(["تاريخ الإضافة", new Date(c.createdAt).toLocaleDateString("ar-EG")]);
+  $("cdBody").innerHTML = (e.photo && e.photo.url ? `<img class="avl" src="${esc(thumb(e.photo.url, 240))}" alt="">` : "")
+    + head.map(row).join("")
+    + '<div class="dsub">هيكل الراتب</div>' + sal.map(row).join("")
+    + '<div class="dsub">الحساب البنكي</div>' + bank.map(row).join("")
+    + (meta.length ? '<div class="dsub">بيانات السجل</div>' + meta.map(row).join("") : "");
+  $("cDetailOv").classList.add("open");
+}
+function closeContractDetail(){ $("cDetailOv").classList.remove("open"); }
+function openPersonalFromContract(){
+  const k = cDetailKey; closeContractDetail();
+  showSection("personal");
+  if(empOf(k)) openDetail(k);
+}
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeContractDetail(); });
+
+function askDeleteContract(key){
+  const e = empOf(key);
+  delKey = key; delJob = false; delCon = true;
+  $("delMsg").textContent = `هتحذف بيانات التعاقد والأجور للموظف "${e ? e.name : key}" (رقم ${key}) بس. باقي بياناته هتفضل زي ما هي.`;
+  $("delOv").classList.add("open");
+}
+
+function exportContract(){
+  const list = contractList();
+  if(!list.length){ toast("مفيش بيانات للتصدير", true); return; }
+  const rows = list.map(c => {
+    const t = cTotals(c);
+    return {
+      "الرقم الوظيفي": c.empNo, "الاسم": c.name, "نوع العقد": c.contractType || "",
+      "بداية العقد": c.startDate || "", "نهاية العقد": c.endDate || (c.contractType === "غير محدد المدة" ? "مفتوح" : ""),
+      "الراتب الأساسي": Number(c.basicSalary) || 0, "بدل سكن": Number(c.housingAllowance) || 0, "بدل انتقال": Number(c.transportAllowance) || 0,
+      "بدل طعام": Number(c.mealAllowance) || 0, "بدل طبيعة عمل": Number(c.natureAllowance) || 0,
+      "إجمالي البدلات": t.allow, "إجمالي الراتب": t.total,
+      "اسم البنك": c.bankName || "", "الفرع": c.bankBranch || "", "رقم الحساب البنكي": String(c.bankAccount || "")
+    };
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws["!cols"] = [14,28,16,14,14,14,12,12,12,14,14,14,22,18,28].map(w => ({wch:w}));
+  ws["!views"] = [{rightToLeft:true}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "التعاقد والأجور");
+  XLSX.writeFile(wb, "employees_contract_" + new Date().toISOString().slice(0,10) + ".xlsx");
+}
+
+clearContractForm();
+clearJobForm();document.addEventListener("keydown", e => { if(e.key === "Escape"){ closeDetail(); closeDel(); } });
+clearForm();
+render();
+</script>
+</body>
+</html>
