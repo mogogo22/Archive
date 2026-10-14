@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>أرشيف الموظفين — البيانات الاجتماعية الشخصية</title>
+<link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -168,6 +169,8 @@ tbody tr:last-child td{border-bottom:none}
 .mfoot button{flex:1;padding:10px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:var(--tr)}
 .mfoot button:hover{border-color:var(--br2);background:var(--s3)}
 .mfoot .danger{border-color:rgba(239,68,68,.35);color:#f87171}
+.mfoot .wa{border-color:rgba(34,197,94,.4);color:#4ade80}
+.mfoot .wa:hover{background:rgba(34,197,94,.1);border-color:var(--green)}
 .mfoot .danger:hover{background:rgba(239,68,68,.12);border-color:var(--red)}
 .mfoot .primary{background:linear-gradient(135deg,var(--blue),#1d4ed8);border-color:transparent;color:#fff}
 .sec{font-size:11px;font-weight:700;color:var(--gold);margin:18px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--br)}
@@ -196,6 +199,10 @@ body.light .fi[type=date]{color-scheme:light}
 .pbadge.part{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24}
 .pbadge.none{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#f87171}
 .dsub{font-size:11px;font-weight:700;color:var(--gold);margin:14px 0 6px}
+.drow .v.pos{color:#4ade80}
+.drow .v.neg{color:#f87171}
+.drow .v.big{color:var(--gold2)}
+.drow .v.co{color:#c084fc}
 .dpap{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;font-weight:600}
 .dpap a{color:var(--blue);text-decoration:none}
 .money{font-family:monospace;font-weight:900;color:#4ade80;white-space:nowrap}
@@ -219,6 +226,8 @@ input,textarea,select,td,.drow .v{-webkit-user-select:text;user-select:text}
 
 .hdr{height:var(--hh);position:static;box-shadow:none;padding:0 16px}
 .hicon{font-size:20px}
+.hicon img{height:34px;width:auto;max-width:120px;display:block;object-fit:contain}
+.llogo .licon img{height:84px;width:auto;max-width:220px;display:inline-block;object-fit:contain}
 .icobtn{width:32px;height:32px;border-radius:var(--r)}
 .logoutbtn{border-radius:var(--r)}
 
@@ -322,19 +331,21 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
 .twrap.scroll th:nth-child(2),.twrap.scroll td:nth-child(2){position:static;min-width:0;inset-inline-start:auto}
 .twrap.scroll th:nth-child(1){width:84px}
 .twrap.scroll th:nth-child(2){width:15%}
-.twrap.scroll th:nth-child(10){width:86px}
-.twrap.scroll th:nth-child(11),.twrap.scroll th:nth-child(12){width:92px}
-.twrap.scroll th:nth-child(13){width:108px}
-.twrap.scroll th:nth-child(14){width:76px}
-@media (max-width:1650px){.twrap.scroll th:nth-child(12),.twrap.scroll td:nth-child(12),.twrap.scroll th:nth-child(8),.twrap.scroll td:nth-child(8){display:none}}
+.twrap.scroll th:nth-child(10),.twrap.scroll th:nth-child(11){width:92px}
+.twrap.scroll th:nth-child(12){width:108px}
+.twrap.scroll th:nth-child(13){width:76px}
+@media (max-width:1650px){.twrap.scroll th:nth-child(11),.twrap.scroll td:nth-child(11),.twrap.scroll th:nth-child(8),.twrap.scroll td:nth-child(8){display:none}}
 @media (max-width:1450px){.twrap.scroll th:nth-child(7),.twrap.scroll td:nth-child(7),.twrap.scroll th:nth-child(6),.twrap.scroll td:nth-child(6){display:none}}
-@media (max-width:1250px){.twrap.scroll th:nth-child(9),.twrap.scroll td:nth-child(9),.twrap.scroll th:nth-child(4),.twrap.scroll td:nth-child(4),.twrap.scroll th:nth-child(11),.twrap.scroll td:nth-child(11){display:none}}
-@media (max-width:1000px){.twrap.scroll th:nth-child(10),.twrap.scroll td:nth-child(10),.twrap.scroll th:nth-child(5),.twrap.scroll td:nth-child(5){display:none}}
+@media (max-width:1250px){.twrap.scroll th:nth-child(9),.twrap.scroll td:nth-child(9),.twrap.scroll th:nth-child(4),.twrap.scroll td:nth-child(4),.twrap.scroll th:nth-child(10),.twrap.scroll td:nth-child(10){display:none}}
+@media (max-width:1000px){.twrap.scroll th:nth-child(5),.twrap.scroll td:nth-child(5){display:none}}
 /* ═══ قسم التعاقد والأجور ═══ */
 .sumbox{background:var(--s3);border:1.5px solid var(--br);border-radius:var(--r);padding:9px 12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:var(--mu);margin-bottom:8px}
 .sumbox b{font-family:monospace;font-size:15px;color:#4ade80}
 .sumbox.big{border-color:var(--gold)}
 .sumbox.big b{font-size:17px;color:var(--gold2)}
+.sumbox.neg b{color:#f87171}
+.sumbox.co{border-color:rgba(192,132,252,.35)}
+.sumbox.co b{color:#c084fc}
 .fi:disabled{opacity:.45;cursor:not-allowed}
 .ctw{overflow-x:hidden}
 .ctw table{min-width:0;width:100%;table-layout:fixed}
@@ -358,7 +369,7 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
   <div class="lgrid"></div>
   <div class="lcard">
     <div class="llogo">
-      <div class="licon">🗄️</div>
+      <div class="licon"><img src="logo.png" alt="KADORF"></div>
       <h1>أرشيف الموظفين</h1>
       <p>سجّل دخولك للوصول إلى الأرشيف</p>
     </div>
@@ -379,10 +390,10 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
   </div>
   <header class="hdr">
     <div class="hbrand">
-      <div class="hicon">🗄️</div>
+      <div class="hicon"><img src="logo.png" alt="KADORF"></div>
       <div>
         <div class="htitle">أرشيف الموظفين</div>
-        <div class="hsub">TEAM ARCHIVE</div>
+        <div class="hsub">KADORF</div>
       </div>
     </div>
     <div class="hright">
@@ -428,7 +439,7 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
       </div>
       <div class="fg">
         <label for="j_ins">رقم التأمين</label>
-        <input class="fi" id="j_ins" dir="ltr" style="text-align:right" inputmode="numeric" maxlength="20" autocomplete="off">
+        <input class="fi" id="j_ins" dir="ltr" style="text-align:right" inputmode="numeric" maxlength="20" autocomplete="off" oninput="this.value=toLatinDigits(this.value).replace(/\D/g,'')">
       </div>
       <div class="fg">
         <label for="j_title"><span class="req">*</span>المسمى الوظيفي</label>
@@ -464,15 +475,9 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
         <input class="fi" id="j_mgr" list="dl_names" maxlength="80" autocomplete="off">
         <datalist id="dl_names"></datalist>
       </div>
-      <div class="firow">
-        <div class="fg">
-          <label for="j_salary">الراتب</label>
-          <input class="fi" id="j_salary" type="number" min="0" step="any" inputmode="decimal" dir="ltr" style="text-align:right">
-        </div>
-        <div class="fg">
-          <label for="j_raise">تاريخ آخر زيادة</label>
-          <input class="fi" id="j_raise" type="date">
-        </div>
+      <div class="fg">
+        <label for="j_raise">تاريخ آخر زيادة</label>
+        <input class="fi" id="j_raise" type="date">
       </div>
       <div class="firow">
         <div class="fg">
@@ -510,7 +515,7 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
       <div class="twrap scroll">
         <table>
           <thead>
-            <tr><th>الرقم الوظيفي</th><th>الاسم</th><th>المسمى الوظيفي</th><th>نوع العمل</th><th>الإدارة الرئيسية</th><th>الإدارة الفرعية</th><th>القطاع</th><th>مدير العمل</th><th>المدير المباشر</th><th>الراتب</th><th>تاريخ التعيين</th><th>آخر زيادة</th><th>الحالة</th><th></th></tr>
+            <tr><th>الرقم الوظيفي</th><th>الاسم</th><th>المسمى الوظيفي</th><th>نوع العمل</th><th>الإدارة الرئيسية</th><th>الإدارة الفرعية</th><th>القطاع</th><th>مدير العمل</th><th>المدير المباشر</th><th>تاريخ التعيين</th><th>آخر زيادة</th><th>الحالة</th><th></th></tr>
           </thead>
           <tbody id="jbody"></tbody>
         </table>
@@ -584,8 +589,52 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
           <input class="fi" id="c_nature" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
         </div>
       </div>
-      <div class="sumbox"><span>إجمالي البدلات</span><b id="c_allow_total">0</b></div>
-      <div class="sumbox big"><span>إجمالي الراتب</span><b id="c_total">0</b></div>
+      <div class="firow">
+        <div class="fg">
+          <label for="c_incentive">حوافز</label>
+          <input class="fi" id="c_incentive" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+        <div class="fg">
+          <label for="c_overtime">أجر إضافي</label>
+          <input class="fi" id="c_overtime" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+      </div>
+      <div class="firow">
+        <div class="fg">
+          <label for="c_bonus">مكافآت</label>
+          <input class="fi" id="c_bonus" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+        <div class="fg">
+          <label for="c_cola">غلاء معيشي</label>
+          <input class="fi" id="c_cola" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+      </div>
+      <div class="fg">
+        <label for="c_commission">عمولات</label>
+        <input class="fi" id="c_commission" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+      </div>
+      <div class="sumbox"><span>إجمالي البدلات والإضافات</span><b id="c_allow_total">0</b></div>
+      <div class="sumbox big"><span>إجمالي الراتب (Gross)</span><b id="c_total">0</b></div>
+
+      <div class="sec">الجزاءات والسلف</div>
+      <div class="firow">
+        <div class="fg">
+          <label for="c_penalty">الجزاءات والخصومات</label>
+          <input class="fi" id="c_penalty" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+        <div class="fg">
+          <label for="c_loan">السُلف والأقساط</label>
+          <input class="fi" id="c_loan" dir="ltr" style="text-align:right" inputmode="decimal" maxlength="12" autocomplete="off" placeholder="0">
+        </div>
+      </div>
+
+      <div class="sec">الاستقطاعات وصافي الراتب (تلقائي)</div>
+      <div class="sumbox neg"><span>التأمينات الاجتماعية (11%)</span><b id="c_ins">0</b></div>
+      <div class="sumbox neg"><span>وعاء الضريبة السنوي</span><b id="c_taxbase">0</b></div>
+      <div class="sumbox neg"><span>ضريبة المرتبات الشهرية</span><b id="c_tax">0</b></div>
+      <div class="sumbox neg"><span>إجمالي الاستقطاعات</span><b id="c_ded_total">0</b></div>
+      <div class="sumbox big"><span>صافي الراتب (Net)</span><b id="c_net">0</b></div>
+      <div class="sumbox co"><span>تكلفة الشركة بالتأمينات (18.75%)</span><b id="c_company">0</b></div>
 
       <div class="sec">بيانات الحساب البنكي</div>
       <div class="fg">
@@ -594,7 +643,7 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
         <datalist id="dl_bank"></datalist>
       </div>
       <div class="fg">
-        <label for="c_branch">الفرع</label>
+        <label for="c_branch">كود الفرع</label>
         <input class="fi" id="c_branch" maxlength="60" autocomplete="off">
       </div>
       <div class="fg">
@@ -678,7 +727,7 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
         <div class="fg">
           <label for="f_pass"><span class="req" id="reqPass" style="display:none">*</span>رقم جواز السفر</label>
           <input class="fi" id="f_pass" dir="ltr" style="text-align:right" maxlength="12" autocomplete="off">
-          <div class="hint">حروف إنجليزي وأرقام. مطلوب لو الجنسية مش مصرية.</div>
+          <div class="hint">اختياري. حروف إنجليزي وأرقام.</div>
         </div>
         <div class="fg">
           <label for="f_nat"><span class="req">*</span>الجنسية</label>
@@ -847,6 +896,7 @@ tbody tr:hover{background:rgba(200,151,58,.09)}
     <div class="mbody" id="cdBody"></div>
     <div class="mfoot">
       <button class="primary" onclick="closeContractDetail(); startContractEdit(cDetailKey)">تعديل</button>
+      <button class="wa" onclick="sendSalaryWA()">💬 واتساب</button>
       <button onclick="openPersonalFromContract()">البيانات الشخصية</button>
       <button class="danger" onclick="closeContractDetail(); askDeleteContract(cDetailKey)">حذف</button>
     </div>
@@ -1021,7 +1071,7 @@ function syncPersonalUI(){
   $("milBox").style.display = $("f_gender").value === "ذكر" ? "" : "none";
   const egy = isEgy();
   $("reqNid").style.display = egy ? "" : "none";
-  $("reqPass").style.display = egy ? "none" : "";
+  $("reqPass").style.display = "none";
 }
 ["f_marital","f_gender"].forEach(id => $(id).addEventListener("change", syncPersonalUI));
 $("f_nat").addEventListener("input", syncPersonalUI);
@@ -1203,8 +1253,6 @@ async function save(){
   if(egy){
     if(!nid) bad.push("f_nid");
     else if(!/^\d{14}$/.test(nid)){ bad.push("f_nid"); msg = "❌ رقم البطاقة لازم يكون 14 رقم"; }
-  } else if(nat){
-    if(!pass){ bad.push("f_pass"); msg = "❌ رقم جواز السفر مطلوب لغير المصريين"; }
   }
   if(!dob) bad.push("f_dob");
   if(!gov) bad.push("f_gov");
@@ -1446,7 +1494,7 @@ if(LOCK_UI){
 }
 
 /* ════ خانات الأرقام: أرقام فقط (بتحوّل الأرقام العربي لإنجليزي وبتمسح أي حرف أو رمز) ════ */
-[["f_no",20],["f_nid",14],["f_kids",2],["f_phone",15],["j_no",20],["j_salary",12]].forEach(([id, max]) => {
+[["f_no",20],["f_nid",14],["f_kids",2],["f_phone",15],["j_no",20]].forEach(([id, max]) => {
   const el = $(id);
   if(el.type === "number") el.type = "text";
   el.setAttribute("inputmode", "numeric");
@@ -1482,13 +1530,11 @@ function openJobDetail(key){
   const e = empOf(key) || {};
   jDetailKey = key;
   $("jdTitle").textContent = e.name || ("رقم " + key);
-  const hasSal = j.salary !== null && j.salary !== undefined && j.salary !== "" && Number.isFinite(Number(j.salary));
   const rows = [
     ["الرقم الوظيفي", key], ["الاسم", e.name || "⚠️ مش في البيانات الشخصية"],
     ["رقم التأمين", j.insuranceNo], ["المسمى الوظيفي", j.jobTitle], ["نوع العمل", j.workType],
     ["الإدارة الرئيسية", j.mainDept], ["الإدارة الفرعية", j.subDept], ["القطاع", j.sector],
     ["مدير العمل", j.workManager], ["المدير المباشر", j.directManager],
-    ["الراتب", hasSal ? Number(j.salary).toLocaleString("en-US") : ""],
     ["تاريخ التعيين", j.hireDate], ["نهاية فترة الاختبار", j.probationEnd],
     ["تاريخ آخر زيادة", j.lastRaiseDate], ["حالة الموظف", j.status]
   ];
@@ -1584,7 +1630,6 @@ function renderJob(){
       <td>${cell(j.sector)}</td>
       <td>${cell(j.workManager)}</td>
       <td>${cell(j.directManager)}</td>
-      <td class="money">${j.salary !== null && j.salary !== undefined && j.salary !== "" && Number.isFinite(Number(j.salary)) ? Number(j.salary).toLocaleString("en-US") : "—"}</td>
       <td>${cell(j.hireDate)}</td>
       <td>${cell(j.lastRaiseDate)}</td>
       <td>${stBadge(j.status)}</td>
@@ -1603,9 +1648,22 @@ $("jbody").addEventListener("click", ev => {
 });
 
 /* ── الفورم ── */
+/* نهاية فترة الاختبار تلقائي = تاريخ التعيين + 3 شهور (وينفع تتعدل يدوي) */
+let probeAuto = true;
+function addMonthsISO(iso, m){
+  const [y, mo, d] = iso.split("-").map(Number);
+  const t = new Date(Date.UTC(y, mo - 1 + m, 1));
+  const last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
+  t.setUTCDate(Math.min(d, last));
+  return t.toISOString().slice(0, 10);
+}
+$("j_probe").addEventListener("input", () => { probeAuto = false; });
+["input","change"].forEach(ev => $("j_hire").addEventListener(ev, () => {
+  if(probeAuto && $("j_hire").value) $("j_probe").value = addMonthsISO($("j_hire").value, 3);
+}));
 function clearJobForm(){
-  jobEditKey = null;
-  ["j_no","j_name","j_ins","j_title","j_wtype","j_dept","j_sub","j_sector","j_wmgr","j_mgr","j_salary","j_raise","j_hire","j_probe"].forEach(i => { $(i).value = ""; $(i).classList.remove("bad"); });
+  jobEditKey = null; probeAuto = true;
+  ["j_no","j_name","j_ins","j_title","j_wtype","j_dept","j_sub","j_sector","j_wmgr","j_mgr","j_raise","j_hire","j_probe"].forEach(i => { $(i).value = ""; $(i).classList.remove("bad"); });
   $("j_status").value = "على رأس العمل"; $("j_status").classList.remove("bad");
   $("j_no").readOnly = false; $("jNoHint").style.display = "block";
   $("jFormTitle").textContent = "➕ بيانات وظيفية";
@@ -1622,9 +1680,10 @@ function startJobEdit(key){
   $("j_ins").value = j.insuranceNo || ""; $("j_title").value = j.jobTitle || ""; $("j_wtype").value = j.workType || "";
   $("j_dept").value = j.mainDept || ""; $("j_sub").value = j.subDept || "";
   $("j_sector").value = j.sector || ""; $("j_wmgr").value = j.workManager || ""; $("j_mgr").value = j.directManager || "";
-  $("j_salary").value = (j.salary === null || j.salary === undefined) ? "" : j.salary;
+  const raise = $("j_raise").value;
   $("j_raise").value = j.lastRaiseDate || "";
   $("j_hire").value = j.hireDate || ""; $("j_probe").value = j.probationEnd || "";
+  probeAuto = !j.probationEnd || (!!j.hireDate && j.probationEnd === addMonthsISO(j.hireDate, 3));
   $("j_status").value = j.status || "";
   $("jFormTitle").textContent = "✏️ تعديل بيانات وظيفية";
   $("jFormBadge").textContent = "تعديل"; $("jFormBadge").classList.add("edit");
@@ -1648,10 +1707,10 @@ async function saveJob(){
   const no = jobEditKey || toLatinDigits(v("j_no"));
   const emp = empOf(no);
   const title = v("j_title");
-  const salaryRaw = $("j_salary").value, raise = $("j_raise").value;
+  const raise = $("j_raise").value;
   const hire = $("j_hire").value, probe = $("j_probe").value, status = $("j_status").value;
 
-  ["j_no","j_title","j_salary","j_raise","j_hire","j_probe","j_status"].forEach(i => $(i).classList.remove("bad"));
+  ["j_no","j_ins","j_title","j_raise","j_hire","j_probe","j_status"].forEach(i => $(i).classList.remove("bad"));
   const bad = []; let msg = "❌ كمّل الخانات المطلوبة";
   if(!no) bad.push("j_no");
   else if(!emp){ bad.push("j_no"); msg = "❌ الرقم ده مش متسجل في البيانات الشخصية. ضيف الموظف هناك الأول"; }
@@ -1659,7 +1718,7 @@ async function saveJob(){
   if(!hire) bad.push("j_hire");
   if(!status) bad.push("j_status");
   if(!bad.length){
-    if(salaryRaw !== "" && !/^\d+$/.test(salaryRaw)){ bad.push("j_salary"); msg = "❌ الراتب: أرقام فقط"; }
+    if(v("j_ins") !== "" && !/^\d+$/.test(toLatinDigits(v("j_ins")))){ bad.push("j_ins"); msg = "❌ رقم التأمين: أرقام فقط"; }
     else if(emp.birthDate && hire <= emp.birthDate){ bad.push("j_hire"); msg = "❌ تاريخ التعيين لازم يكون بعد تاريخ الميلاد (" + emp.birthDate + ")"; }
     else if(probe && probe < hire){ bad.push("j_probe"); msg = "❌ نهاية فترة الاختبار قبل تاريخ التعيين"; }
     else if(raise && raise < hire){ bad.push("j_raise"); msg = "❌ تاريخ آخر زيادة قبل تاريخ التعيين"; }
@@ -1670,7 +1729,7 @@ async function saveJob(){
   const fields = {
     jobTitle: title, insuranceNo: toLatinDigits(v("j_ins")), workType: v("j_wtype"), mainDept: v("j_dept"), subDept: v("j_sub"), sector: v("j_sector"),
     workManager: v("j_wmgr"), directManager: v("j_mgr"),
-    salary: salaryRaw === "" ? null : Number(salaryRaw), lastRaiseDate: raise,
+    lastRaiseDate: raise,
     hireDate: hire, probationEnd: probe, status
   };
   jobSaving = true; $("jSaveBtn").disabled = true;
@@ -1706,20 +1765,26 @@ function exportJob(){
     "الرقم الوظيفي": j.empNo, "الاسم": j.name, "رقم التأمين": j.insuranceNo || "", "المسمى الوظيفي": j.jobTitle || "", "نوع العمل": j.workType || "",
     "الإدارة الرئيسية": j.mainDept || "", "الإدارة الفرعية": j.subDept || "", "القطاع": j.sector || "",
     "مدير العمل": j.workManager || "", "المدير المباشر": j.directManager || "",
-    "الراتب": (j.salary === null || j.salary === undefined) ? "" : j.salary,
     "تاريخ التعيين": j.hireDate || "", "نهاية فترة الاختبار": j.probationEnd || "",
     "تاريخ آخر زيادة": j.lastRaiseDate || "", "حالة الموظف": j.status || ""
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
-  ws["!cols"] = [14,28,16,24,18,22,22,18,22,22,12,14,18,16,16].map(w => ({wch:w}));
+  ws["!cols"] = [14,28,16,24,18,22,22,18,22,22,14,18,16,16].map(w => ({wch:w}));
   ws["!views"] = [{rightToLeft:true}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "البيانات الوظيفية");
   XLSX.writeFile(wb, "employees_job_" + new Date().toISOString().slice(0,10) + ".xlsx");
 }
 /* ════════════ القسم 3: بيانات التعاقد والأجور ════════════ */
-const ALLOW_FIELDS = [["c_housing","housingAllowance","بدل سكن"],["c_transport","transportAllowance","بدل انتقال"],["c_meal","mealAllowance","بدل طعام"],["c_nature","natureAllowance","بدل طبيعة عمل"]];
+const ALLOW_FIELDS = [["c_housing","housingAllowance","بدل سكن"],["c_transport","transportAllowance","بدل انتقال"],["c_meal","mealAllowance","بدل طعام"],["c_nature","natureAllowance","بدل طبيعة عمل"],["c_incentive","incentiveAllowance","حوافز"],["c_bonus","bonusAllowance","مكافآت"],["c_cola","colaAllowance","غلاء معيشي"],["c_commission","commissionAllowance","عمولات"]];
 const MONEY_IDS = ["c_basic", ...ALLOW_FIELDS.map(a => a[0])];
+const EXTRA_FIELDS = [["c_overtime","overtime","أجر إضافي"],["c_penalty","penalties","جزاءات وخصومات"],["c_loan","loans","سلف وأقساط"]];
+const EXTRA_IDS = EXTRA_FIELDS.map(a => a[0]);
+/* إعدادات حساب التأمينات والضريبة (من شيت الإكسيل) — [حد أعلى للشريحة, قيمة ثابتة, نسبة, بداية الشريحة] */
+const PAY = {
+  insMin: 2700, insMax: 16700, insEmp: 0.11, insCo: 0.1875, annualExempt: 20000,
+  brackets: [[40000,0,0,0],[55000,0,0.10,40000],[70000,1500,0.15,55000],[200000,3750,0.20,70000],[400000,29750,0.225,200000],[Infinity,74750,0.275,400000]]
+};
 const BANKS = ["البنك الأهلي المصري","بنك مصر","البنك التجاري الدولي (CIB)","بنك القاهرة","بنك الإسكندرية","بنك QNB","بنك HSBC","بنك فيصل الإسلامي","بنك أبوظبي الأول","بنك الإمارات دبي الوطني","البنك العربي الأفريقي الدولي","بنك التعمير والإسكان","بنك قناة السويس","المصرف المتحد","بنك الكويت الوطني","بنك المشرق"];
 
 function startContractSync(){
@@ -1738,18 +1803,43 @@ function cNum(raw){
   if(t === "") return 0;
   return /^\d+(\.\d{1,2})?$/.test(t) ? Number(t) : NaN;
 }
-function cTotals(c){
-  const allow = r2(ALLOW_FIELDS.reduce((s, a) => s + (Number(c[a[1]]) || 0), 0));
-  return {allow, total: r2((Number(c.basicSalary) || 0) + allow)};
+function calcPay(c){
+  const n = k => Number(c[k]) || 0;
+  const allow = r2(ALLOW_FIELDS.reduce((s, a) => s + n(a[1]), 0));
+  const overtime = n("overtime");
+  const gross = r2(n("basicSalary") + allow + overtime);
+  const insBase = gross > 0 ? Math.max(PAY.insMin, Math.min(gross, PAY.insMax)) : 0;
+  const insRaw = insBase * PAY.insEmp;
+  const taxBase = Math.max(0, Math.trunc(((gross - insRaw) * 12 - PAY.annualExempt) / 10) * 10);
+  const b = PAY.brackets.find(x => taxBase <= x[0]);
+  const tax = r2((b[1] + (taxBase - b[3]) * b[2]) / 12);
+  const ins = r2(insRaw), penalties = n("penalties"), loans = n("loans");
+  const ded = r2(ins + tax + penalties + loans);
+  return {allow, overtime, gross, ins, taxBase, tax, penalties, loans, ded, net: r2(gross - ded), company: r2(insBase * PAY.insCo)};
+}
+function cTotals(c){ const p = calcPay(c); return {...p, total: p.gross}; }
+function payRows(t){
+  return [["التأمينات الاجتماعية (11%)", money(t.ins), "neg"], ["وعاء الضريبة السنوي", money(t.taxBase), "neg"], ["ضريبة المرتبات الشهرية", money(t.tax), "neg"],
+  ["الجزاءات والخصومات", money(t.penalties), "neg"], ["السلف والأقساط", money(t.loans), "neg"], ["إجمالي الاستقطاعات", money(t.ded), "neg"],
+  ["صافي الراتب (Net)", money(t.net), "big"], ["تكلفة الشركة بالتأمينات (18.75%)", money(t.company), "co"]];
+}
+function updatePayPreview(){
+  const ids = [...MONEY_IDS, ...EXTRA_IDS], vals = {};
+  const ok = ids.every(id => !Number.isNaN(vals[id] = cNum($(id).value)));
+  const c = {};
+  if(ok){ c.basicSalary = vals.c_basic; ALLOW_FIELDS.concat(EXTRA_FIELDS).forEach(a => { c[a[1]] = vals[a[0]]; }); }
+  const p = calcPay(c);
+  $("c_total").textContent = money(p.gross); $("c_ins").textContent = money(p.ins); $("c_taxbase").textContent = money(p.taxBase);
+  $("c_tax").textContent = money(p.tax); $("c_ded_total").textContent = money(p.ded); $("c_net").textContent = money(p.net); $("c_company").textContent = money(p.company);
 }
 function calcContractTotals(){
   const vals = MONEY_IDS.map(id => cNum($(id).value));
   const ok = vals.every(n => !Number.isNaN(n));
   const allow = ok ? r2(vals.slice(1).reduce((a, b) => a + b, 0)) : 0;
   $("c_allow_total").textContent = money(allow);
-  $("c_total").textContent = money(ok ? r2(vals[0] + allow) : 0);
+  updatePayPreview();
 }
-MONEY_IDS.forEach(id => $(id).addEventListener("input", calcContractTotals));
+[...MONEY_IDS, ...EXTRA_IDS].forEach(id => $(id).addEventListener("input", calcContractTotals));
 
 function syncContractUI(){
   const indef = $("c_type").value === "غير محدد المدة";
@@ -1769,7 +1859,7 @@ $("c_no").addEventListener("input", () => {
 
 function clearContractForm(){
   conEditKey = null;
-  ["c_no","c_name","c_start","c_end","c_basic","c_housing","c_transport","c_meal","c_nature","c_bank","c_branch","c_acc"].forEach(i => { $(i).value = ""; $(i).classList.remove("bad"); });
+  ["c_no","c_name","c_start","c_end","c_basic","c_housing","c_transport","c_meal","c_nature","c_incentive","c_bonus","c_cola","c_commission","c_overtime","c_penalty","c_loan","c_bank","c_branch","c_acc"].forEach(i => { $(i).value = ""; $(i).classList.remove("bad"); });
   $("c_type").value = ""; $("c_type").classList.remove("bad");
   $("c_no").readOnly = false; $("cNoHint").style.display = "block";
   syncContractUI(); calcContractTotals();
@@ -1788,7 +1878,7 @@ function startContractEdit(key){
   $("c_type").value = c.contractType || "";
   $("c_start").value = c.startDate || ""; $("c_end").value = c.endDate || "";
   $("c_basic").value = c.basicSalary || "";
-  ALLOW_FIELDS.forEach(a => { $(a[0]).value = c[a[1]] || ""; });
+  ALLOW_FIELDS.concat(EXTRA_FIELDS).forEach(a => { $(a[0]).value = c[a[1]] || ""; });
   $("c_bank").value = c.bankName || ""; $("c_branch").value = c.bankBranch || ""; $("c_acc").value = c.bankAccount || "";
   syncContractUI(); calcContractTotals();
   $("cFormTitle").textContent = "✏️ تعديل بيانات تعاقد وأجور";
@@ -1809,10 +1899,11 @@ async function saveContract(){
   const indef = type === "غير محدد المدة";
   const basic = cNum($("c_basic").value);
   const allow = ALLOW_FIELDS.map(a => cNum($(a[0]).value));
+  const extra = EXTRA_FIELDS.map(a => cNum($(a[0]).value));
   const bank = v("c_bank"), branch = v("c_branch");
   const acc = toLatinDigits(v("c_acc")).replace(/[\s-]/g, "").toUpperCase();
 
-  ["c_no","c_type","c_start","c_end","c_basic","c_bank","c_acc"].concat(ALLOW_FIELDS.map(a => a[0])).forEach(i => $(i).classList.remove("bad"));
+  ["c_no","c_type","c_start","c_end","c_basic","c_bank","c_acc"].concat(ALLOW_FIELDS.map(a => a[0]), EXTRA_IDS).forEach(i => $(i).classList.remove("bad"));
   const bad = []; let msg = "❌ كمّل الخانات المطلوبة";
   if(!no) bad.push("c_no");
   else if(!emp){ bad.push("c_no"); msg = "❌ الرقم ده مش متسجل في البيانات الشخصية. ضيف الموظف هناك الأول"; }
@@ -1824,6 +1915,7 @@ async function saveContract(){
     const badAllow = allow.findIndex(n => Number.isNaN(n));
     if(Number.isNaN(basic)){ bad.push("c_basic"); msg = "❌ الراتب الأساسي: أرقام فقط (وينفع كسور لحد رقمين)"; }
     else if(badAllow >= 0){ bad.push(ALLOW_FIELDS[badAllow][0]); msg = "❌ " + ALLOW_FIELDS[badAllow][2] + ": أرقام فقط (وينفع كسور لحد رقمين)"; }
+    else if(extra.some(n => Number.isNaN(n))){ const xi = extra.findIndex(n => Number.isNaN(n)); bad.push(EXTRA_FIELDS[xi][0]); msg = "❌ " + EXTRA_FIELDS[xi][2] + ": أرقام فقط (وينفع كسور لحد رقمين)"; }
     else if(!indef && end < start){ bad.push("c_end"); msg = "❌ نهاية العقد قبل تاريخ البداية"; }
     else if(emp.birthDate && start <= emp.birthDate){ bad.push("c_start"); msg = "❌ بداية العقد لازم تكون بعد تاريخ الميلاد (" + emp.birthDate + ")"; }
     else if(acc && !bank){ bad.push("c_bank"); msg = "❌ اكتب اسم البنك مع رقم الحساب"; }
@@ -1834,7 +1926,7 @@ async function saveContract(){
   const who = (auth && auth.currentUser && auth.currentUser.email) || "بدون تسجيل";
   const fields = {
     contractType: type, startDate: start, endDate: indef ? "" : end,
-    basicSalary: basic, housingAllowance: allow[0], transportAllowance: allow[1], mealAllowance: allow[2], natureAllowance: allow[3],
+    basicSalary: basic, housingAllowance: allow[0], transportAllowance: allow[1], mealAllowance: allow[2], natureAllowance: allow[3], incentiveAllowance: allow[4], bonusAllowance: allow[5], colaAllowance: allow[6], commissionAllowance: allow[7], overtime: extra[0], penalties: extra[1], loans: extra[2],
     bankName: bank, bankBranch: branch, bankAccount: acc
   };
   conSaving = true; $("cSaveBtn").disabled = true;
@@ -1929,27 +2021,63 @@ function openContractDetail(key){
   cDetailKey = key;
   $("cdTitle").textContent = e.name || ("رقم " + key);
   const t = cTotals(c);
-  const row = a => `<div class="drow"><span class="k">${esc(a[0])}</span><span class="v">${esc(a[1] || "—")}</span></div>`;
+  const row = a => `<div class="drow"><span class="k">${esc(a[0])}</span><span class="v${a[2] ? " " + a[2] : ""}">${esc(a[1] || "—")}</span></div>`;
   const head = [
     ["الرقم الوظيفي", key], ["الاسم", e.name || "⚠️ مش في البيانات الشخصية"],
     ["نوع العقد", c.contractType], ["بداية العقد", c.startDate],
     ["نهاية العقد", c.endDate || (c.contractType === "غير محدد المدة" ? "مفتوح (غير محدد المدة)" : "")]
   ];
-  const sal = [["الراتب الأساسي", money(c.basicSalary)]].concat(
-    ALLOW_FIELDS.map(a => [a[2], money(c[a[1]])]),
-    [["إجمالي البدلات", money(t.allow)], ["إجمالي الراتب", money(t.total)]]);
-  const bank = [["اسم البنك", c.bankName], ["الفرع", c.bankBranch], ["رقم الحساب البنكي", c.bankAccount]];
+  const sal = [["الراتب الأساسي", money(c.basicSalary), "pos"]].concat(
+    ALLOW_FIELDS.map(a => [a[2], money(c[a[1]]), "pos"]),
+    [["إجمالي البدلات والإضافات", money(t.allow), "pos"], ["أجر إضافي", money(t.overtime), "pos"], ["إجمالي الراتب (Gross)", money(t.total), "big"]]);
+  const bank = [["اسم البنك", c.bankName], ["كود الفرع", c.bankBranch], ["رقم الحساب البنكي", c.bankAccount]];
   const meta = [];
   if(c.createdBy) meta.push(["أضافه", c.createdBy]);
   if(c.createdAt) meta.push(["تاريخ الإضافة", new Date(c.createdAt).toLocaleDateString("ar-EG")]);
   $("cdBody").innerHTML = (e.photo && e.photo.url ? `<img class="avl" src="${esc(thumb(e.photo.url, 240))}" alt="">` : "")
     + head.map(row).join("")
     + '<div class="dsub">هيكل الراتب</div>' + sal.map(row).join("")
+    + '<div class="dsub">الاستقطاعات وصافي الراتب</div>' + payRows(t).map(row).join("")
     + '<div class="dsub">الحساب البنكي</div>' + bank.map(row).join("")
     + (meta.length ? '<div class="dsub">بيانات السجل</div>' + meta.map(row).join("") : "");
   $("cDetailOv").classList.add("open");
 }
 function closeContractDetail(){ $("cDetailOv").classList.remove("open"); }
+
+/* ════ إرسال تفاصيل المرتب على واتساب ════ */
+const AR_MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+function waPhone(raw){
+  let p = toLatinDigits(raw || "").replace(/\D/g, "");
+  if(p.startsWith("00")) p = p.slice(2);
+  else if(/^0\d{10}$/.test(p)) p = "20" + p.slice(1);
+  else if(/^1\d{9}$/.test(p)) p = "20" + p;
+  return p;
+}
+function salaryMsg(c, e){
+  const t = cTotals(c), d = new Date();
+  const ln = (k, v) => "- " + k + ": " + money(v);
+  const L = ["السلام عليكم ورحمة الله وبركاته 👋"];
+  if(e.name) L.push("الأستاذ/ " + e.name);
+  L.push("🆔 الرقم الوظيفي: " + (e.empNo || cDetailKey));
+  L.push("", "تفاصيل مرتبك عن شهر " + AR_MONTHS[d.getMonth()] + " " + d.getFullYear() + ":", "", "💰 *الراتب والإضافات*", ln("الراتب الأساسي", c.basicSalary));
+  ALLOW_FIELDS.forEach(a => { if(Number(c[a[1]]) > 0) L.push(ln(a[2], c[a[1]])); });
+  if(t.overtime > 0) L.push(ln("أجر إضافي", t.overtime));
+  L.push("✅ *إجمالي الراتب (Gross): " + money(t.gross) + "*", "", "🔻 *الاستقطاعات*", ln("التأمينات الاجتماعية", t.ins), ln("ضريبة المرتبات", t.tax));
+  if(t.penalties > 0) L.push(ln("الجزاءات والخصومات", t.penalties));
+  if(t.loans > 0) L.push(ln("السلف والأقساط", t.loans));
+  L.push("🔻 *إجمالي الاستقطاعات: " + money(t.ded) + "*", "", "💵 *صافي الراتب (Net): " + money(t.net) + " جنيه*", "");
+  if(c.bankName) L.push("تم تحويل الراتب على " + c.bankName, "");
+  L.push("لأي استفسار تواصل مع الإدارة. شكرًا 🌹");
+  return L.join("\n");
+}
+function sendSalaryWA(){
+  const c = CONTRACT[cDetailKey]; if(!c) return;
+  const e = empOf(cDetailKey) || {};
+  const ph = waPhone(e.phone);
+  if(!ph){ toast("⛔ مفيش رقم هاتف للموظف ده في البيانات الشخصية", true); return; }
+  if(!/^\d{8,15}$/.test(ph)){ toast("⛔ رقم الهاتف غير صالح لواتساب: " + ph, true); return; }
+  window.open("https://wa.me/" + ph + "?text=" + encodeURIComponent(salaryMsg(c, e).replace(/[\u{1F000}-\u{1FAFF}\u{2190}-\u{2BFF}\uFE0F]/gu, "").replace(/^[ \t]+|[ \t]+$/gm, "")), "_blank", "noopener");
+}
 function openPersonalFromContract(){
   const k = cDetailKey; closeContractDetail();
   showSection("personal");
@@ -1973,13 +2101,15 @@ function exportContract(){
       "الرقم الوظيفي": c.empNo, "الاسم": c.name, "نوع العقد": c.contractType || "",
       "بداية العقد": c.startDate || "", "نهاية العقد": c.endDate || (c.contractType === "غير محدد المدة" ? "مفتوح" : ""),
       "الراتب الأساسي": Number(c.basicSalary) || 0, "بدل سكن": Number(c.housingAllowance) || 0, "بدل انتقال": Number(c.transportAllowance) || 0,
-      "بدل طعام": Number(c.mealAllowance) || 0, "بدل طبيعة عمل": Number(c.natureAllowance) || 0,
-      "إجمالي البدلات": t.allow, "إجمالي الراتب": t.total,
-      "اسم البنك": c.bankName || "", "الفرع": c.bankBranch || "", "رقم الحساب البنكي": String(c.bankAccount || "")
+      "بدل طعام": Number(c.mealAllowance) || 0, "بدل طبيعة عمل": Number(c.natureAllowance) || 0, "حوافز": Number(c.incentiveAllowance) || 0, "مكافآت": Number(c.bonusAllowance) || 0, "غلاء معيشي": Number(c.colaAllowance) || 0, "عمولات": Number(c.commissionAllowance) || 0, "أجر إضافي": Number(c.overtime) || 0,
+      "إجمالي البدلات والإضافات": t.allow, "إجمالي الراتب (Gross)": t.total,
+      "التأمينات الاجتماعية (11%)": t.ins, "وعاء الضريبة السنوي": t.taxBase, "ضريبة المرتبات الشهرية": t.tax, "الجزاءات والخصومات": t.penalties, "السلف والأقساط": t.loans,
+      "إجمالي الاستقطاعات": t.ded, "صافي الراتب (Net)": t.net, "تكلفة الشركة بالتأمينات (18.75%)": t.company,
+      "اسم البنك": c.bankName || "", "كود الفرع": c.bankBranch || "", "رقم الحساب البنكي": String(c.bankAccount || "")
     };
   });
   const ws = XLSX.utils.json_to_sheet(rows);
-  ws["!cols"] = [14,28,16,14,14,14,12,12,12,14,14,14,22,18,28].map(w => ({wch:w}));
+  ws["!cols"] = [14,28,16,14,14,14,12,12,12,12,12,12,12,12,12,14,16,16,16,16,14,14,16,16,18,22,18,28].map(w => ({wch:w}));
   ws["!views"] = [{rightToLeft:true}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "التعاقد والأجور");
@@ -1993,3 +2123,4 @@ render();
 </script>
 </body>
 </html>
+
